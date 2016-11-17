@@ -18,8 +18,11 @@ class AStrategyBuilding : public APawn, public IStrategyTeamInterface
 {
 	GENERATED_UCLASS_BODY()
 
+	UPROPERTY(VisibleDefaultsOnly, Category = DeadEffect)
+	UParticleSystemComponent* ParticleComp;
+
 	/** team */
-	UPROPERTY(EditInstanceOnly, Category=Building)
+	UPROPERTY(Replicated, EditInstanceOnly, Category=Building)
 	TEnumAsByte<EStrategyTeam::Type> SpawnTeamNum;
 
 	// Begin Actor interface
@@ -35,21 +38,31 @@ class AStrategyBuilding : public APawn, public IStrategyTeamInterface
 	// Begin StrategyTeamInterface interface
 
 	/** [IStrategyTeamInterface] get team number */
+	UFUNCTION(BlueprintCallable, Category = "Team")
 	virtual uint8 GetTeamNum() const override;
-
 	// End StrategyTeamInterface interface
 
 	//////////////////////////////////////////////////////////////////////////
 	// Reading data
 
+	UFUNCTION(Client,Reliable)
+	void CLIENT_Deactivate();
 
 	/** get building's name */
 	FString GetBuildingName() const;
+
+	UFUNCTION()
+	bool IsActive();
 
 protected:
 	/** name of building */
 	UPROPERTY(EditDefaultsOnly, Category=Building)
 	FString BuildingName;
+
+	void Deactivate();
+
+	UPROPERTY()
+	bool Active;
 
 private:
 	/** trigger box component */

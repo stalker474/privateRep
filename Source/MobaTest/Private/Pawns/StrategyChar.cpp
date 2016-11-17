@@ -46,6 +46,7 @@ void AStrategyChar::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & Out
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(AStrategyChar, MeleeAnim);
+	DOREPLIFETIME(AStrategyChar, MyTeamNum);
 }
 
 void AStrategyChar::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalForce, const FHitResult& Hit)
@@ -113,7 +114,6 @@ void AStrategyChar::OnMeleeImpactNotify()
 		}
 	}
 }
-
 
 float AStrategyChar::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
@@ -236,7 +236,6 @@ void AStrategyChar::SetWeaponAttachment(UStrategyAttachment* Weapon)
 		WeaponSlot = Weapon;
 		if (WeaponSlot )
 		{
-			WeaponSlot->RegisterComponent();
 			WeaponSlot->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, WeaponSlot->AttachPoint);
 		}
 	}
@@ -255,7 +254,6 @@ void AStrategyChar::SetArmorAttachment(UStrategyAttachment* Armor)
 		ArmorSlot = Armor;
 		if (ArmorSlot )
 		{
-			ArmorSlot->RegisterComponent();
 			ArmorSlot->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, ArmorSlot->AttachPoint);
 		}
 	}

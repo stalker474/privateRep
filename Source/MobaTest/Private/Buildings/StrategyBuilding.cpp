@@ -10,6 +10,7 @@ AStrategyBuilding::AStrategyBuilding(const FObjectInitializer& ObjectInitializer
 	: Super(ObjectInitializer)
 	, BuildingName(TEXT("Unknown"))
 	, SpawnTeamNum(EStrategyTeam::Unknown)
+	,Active(true)
 {
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
@@ -18,6 +19,12 @@ AStrategyBuilding::AStrategyBuilding(const FObjectInitializer& ObjectInitializer
 	USceneComponent* const TranslationComp = CreateDefaultSubobject<USceneComponent>(TEXT("SceneComp"));
 	TranslationComp->Mobility = EComponentMobility::Static;
 	RootComponent = TranslationComp;
+
+	ParticleComp = ObjectInitializer.CreateDefaultSubobject<UParticleSystemComponent>(this, TEXT("ParticleComp"));
+	ParticleComp->bAutoActivate = false;
+	ParticleComp->bAutoDestroy = false;
+	ParticleComp->SetupAttachment(RootComponent);
+	ParticleComp->SetIsReplicated(true);
 
 	TriggerBox = CreateDefaultSubobject<UBoxComponent>(TEXT("Box"));
 	TriggerBox->bVisible = true;
@@ -45,6 +52,12 @@ void AStrategyBuilding::PostLoad()
 	}
 }
 
+void AStrategyBuilding::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(AStrategyBuilding, SpawnTeamNum);
+}
+
 void AStrategyBuilding::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
@@ -53,6 +66,22 @@ void AStrategyBuilding::PostInitializeComponents()
 void AStrategyBuilding::Destroyed()
 {
 	Super::Destroyed();
+}
+
+void AStrategyBuilding::Deactivate()
+{
+	Active = false;
+	CLIENT_Deactivate();
+}
+
+void AStrategyBuilding::CLIENT_Deactivate_Implementation()
+{
+	ParticleComp->ActivateSystem(true);
+}
+
+bool AStrategyBuilding::IsActive()
+{
+	return Active;
 }
 
 FPlayerData* AStrategyBuilding::GetTeamData() const

@@ -7,5 +7,3 @@ uint8 AStrategySpawnPoint::GetTeamNum() const
 {
 	return SpawnTeamNum;
 }
-
-

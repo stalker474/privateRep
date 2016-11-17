@@ -56,6 +56,7 @@ public:
 
 
 	// Begin StrategyTeamInterface interface
+	UFUNCTION(BlueprintCallable, Category = "Team")
 	virtual uint8 GetTeamNum() const override;
 	// End StrategyTeamInterface interface
 
@@ -115,6 +116,7 @@ protected:
 	UStrategyAttachment* WeaponSlot;
 
 	/** team number */
+	UPROPERTY(Replicated)
 	uint8 MyTeamNum;
 
 	/** base pawn data */

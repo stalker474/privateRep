@@ -40,10 +40,16 @@ public:
 
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadOnly, Category = GUI)
 	class UTexture2D* Icon;
+	
+	float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
+	/* IStrategyTeamInterface
+	*/
+	UFUNCTION(BlueprintCallable, Category = "Team")
 	uint8 GetTeamNum() const { return EStrategyTeam::Player; };
 
-	float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+	/* End IStrategyTeamInterface
+	*/
 
 protected:
 

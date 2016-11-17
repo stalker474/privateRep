@@ -20,7 +20,6 @@ AMobaProjectile::AMobaProjectile(const FObjectInitializer& ObjectInitializer) : 
 	CollisionComp->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
 	CollisionComp->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Block);
 	CollisionComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
-	CollisionComp->MoveIgnoreActors.Add(GetOwner());
 	RootComponent = CollisionComp;
 
 	ParticleComp = ObjectInitializer.CreateDefaultSubobject<UParticleSystemComponent>(this, TEXT("ParticleComp"));
@@ -48,14 +47,6 @@ void AMobaProjectile::PostInitializeComponents()
 	Super::PostInitializeComponents();
 	MovementComp->OnProjectileStop.AddDynamic(this, &AMobaProjectile::OnImpact);
 	CollisionComp->MoveIgnoreActors.Add(Instigator);
-
-/*	AShooterWeapon_Projectile* OwnerWeapon = Cast<AShooterWeapon_Projectile>(GetOwner());
-	if (OwnerWeapon)
-	{
-		OwnerWeapon->ApplyWeaponConfig(WeaponConfig);
-	}
-
-	SetLifeSpan(WeaponConfig.ProjectileLife);*/
 	MyController = GetInstigatorController();
 }
 

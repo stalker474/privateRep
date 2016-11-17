@@ -31,7 +31,7 @@ bool UStrategyAISensingComponent::ShouldCheckVisibilityOf(APawn *Pawn) const
 		return !testChar->bHidden && testChar->CombatComponent->Health > 0 && AStrategyGameMode::OnEnemyTeam(Pawn, GetOwner());
 	else if (mobaTower)
 	{
-		return !mobaTower->bHidden && mobaTower->CombatComponent->Health > 0 && AStrategyGameMode::OnEnemyTeam(Pawn, GetOwner());
+		return !mobaTower->bHidden && mobaTower->IsActive() && mobaTower->CombatComponent->Health > 0 && AStrategyGameMode::OnEnemyTeam(Pawn, GetOwner());
 	}
 	else
 		return false;

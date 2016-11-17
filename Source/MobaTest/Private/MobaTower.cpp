@@ -65,7 +65,12 @@ float AMobaTower::TakeDamage(float DamageAmount, struct FDamageEvent const& Dama
 	CombatComponent->ApplyDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	if (CombatComponent->Health <= 0)
 	{
-		this->Destroy();
+		Active = false;
+		Weapon->Activate(false);
+		CombatComponent->Health = 0;
+		DecalComponent->SetVisibility(false);
+		Abort();
+		Deactivate();
 	}
 	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 }
