@@ -19,13 +19,21 @@ public:
 	// Called every frame
 	virtual void TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction ) override;
 
+	void InitializeComponent() override;
+
 	float ApplyDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser);
 
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadOnly, Category = Stats)
-	float MaxHealth;
+	float BaseHealth;
 
-	UPROPERTY(Replicated, EditAnywhere, BlueprintReadOnly, Category = Stats)
+	UPROPERTY(Replicated, BlueprintReadOnly, Category = Stats)
 	float Health;
+
+	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadOnly, Category = Stats)
+	float HealthLevelBonus;
+
+	UFUNCTION(BlueprintCallable, Category = Stats)
+	float GetModifiedHealth();
 
 	UParticleSystemComponent * ParticleSystem;
 

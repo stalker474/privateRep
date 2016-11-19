@@ -357,7 +357,7 @@ void AStrategyAIController::GrabDebugSnapshot(FVisualLogEntry* Snapshot) const
 		MyCategory.Add(TEXT("AttackMin"), FString::FromInt(MyChar->GetPawnData()->AttackMin));
 		MyCategory.Add(TEXT("MaxHealthBonus"), FString::FromInt(MyChar->GetPawnData()->MaxHealthBonus));
 		MyCategory.Add(TEXT("Health"), FString::FromInt(MyChar->CombatComponent->Health));
-		MyCategory.Add(TEXT("MaxHealth"), FString::FromInt(MyChar->CombatComponent->MaxHealth));
+		MyCategory.Add(TEXT("BaseHealth"), FString::FromInt(MyChar->CombatComponent->BaseHealth));
 	}
 
 	Snapshot->Status.Add(MyCategory);

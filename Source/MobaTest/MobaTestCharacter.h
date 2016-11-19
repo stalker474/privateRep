@@ -25,11 +25,11 @@ public:
 	AMobaTestCharacter();
 
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 	float BaseTurnRate;
 
 	/** Base look up/down rate, in deg/sec. Other scaling may affect final rate. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 	float BaseLookUpRate;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Abilities)
@@ -40,18 +40,31 @@ public:
 
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadOnly, Category = GUI)
 	class UTexture2D* Icon;
+
+	UPROPERTY(Replicated, BlueprintReadOnly)
+	int Level;
+
+	UPROPERTY(Replicated, BlueprintReadOnly)
+	int Experience;
+
+	UFUNCTION(Server, Reliable,BlueprintCallable, WithValidation, Category = "Team")
+	void LevelUp();
 	
 	float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
 	/* IStrategyTeamInterface
 	*/
 	UFUNCTION(BlueprintCallable, Category = "Team")
-	uint8 GetTeamNum() const { return EStrategyTeam::Player; };
+	uint8 GetTeamNum() const { return MyTeamNum; };
 
 	/* End IStrategyTeamInterface
 	*/
 
 protected:
+
+	/** team number */
+	UPROPERTY(Replicated)
+	uint8 MyTeamNum;
 
 	/** Called for forwards/backward input */
 	void MoveForward(float Value);
@@ -59,16 +72,16 @@ protected:
 	/** Called for side to side input */
 	void MoveRight(float Value);
 
-	/** 
-	 * Called via input to turn at a given rate. 
-	 * @param Rate	This is a normalized rate, i.e. 1.0 means 100% of desired turn rate
-	 */
+	/**
+	* Called via input to turn at a given rate.
+	* @param Rate	This is a normalized rate, i.e. 1.0 means 100% of desired turn rate
+	*/
 	void TurnAtRate(float Rate);
 
 	/**
-	 * Called via input to turn look up/down at a given rate. 
-	 * @param Rate	This is a normalized rate, i.e. 1.0 means 100% of desired turn rate
-	 */
+	* Called via input to turn look up/down at a given rate.
+	* @param Rate	This is a normalized rate, i.e. 1.0 means 100% of desired turn rate
+	*/
 	void LookUpAtRate(float Rate);
 
 protected:

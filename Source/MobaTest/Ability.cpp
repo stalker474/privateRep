@@ -22,6 +22,13 @@ UAbility::UAbility(const FObjectInitializer& ObjectInitializer)
 	ReloadingTime = 1.0f;
 	ClientData.CamFrwd = FRotator::ZeroRotator;
 	ClientData.AimingPosition = FVector::ZeroVector;
+
+	Level = 1;
+
+	Level1ManaCost = 0;
+	Level2ManaCost = 0;
+	Level3ManaCost = 0;
+	Level4ManaCost = 0;
 	// ...
 }
 
@@ -43,14 +50,21 @@ void UAbility::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifet
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(UAbility, Reloaded);
-	DOREPLIFETIME(UAbility, ManaCost);
+	DOREPLIFETIME(UAbility, Level1ManaCost);
+	DOREPLIFETIME(UAbility, Level2ManaCost);
+	DOREPLIFETIME(UAbility, Level3ManaCost);
+	DOREPLIFETIME(UAbility, Level4ManaCost);
 	DOREPLIFETIME(UAbility, Icon);
+	DOREPLIFETIME(UAbility, Level);
 }
 
 void UAbility::Aim()
 {
-	State = EAbilityStateEnum::AIMING;
-	UpdateState();
+	if (Level > 0)
+	{
+		State = EAbilityStateEnum::AIMING;
+		UpdateState();
+	}
 }
 
 void UAbility::StartCast(float castingTime)
@@ -70,6 +84,35 @@ void UAbility::Cancel()
 {
 	State = EAbilityStateEnum::NONE;
 	UpdateState();
+}
+
+void UAbility::LevelUp()
+{
+	if (Level < 4 && CanLevelUp())
+		Level++;
+}
+
+bool UAbility::CanLevelUp()
+{
+	return true;
+}
+
+float UAbility::GetModifiedManaCost()
+{
+	switch (Level)
+	{
+	case 0:
+		return 0; //no mana cost and no ability to cast
+	case 1:
+		return Level1ManaCost;
+	case 2:
+		return Level2ManaCost;
+	case 3:
+		return Level3ManaCost;
+	case 4:
+		return Level4ManaCost;
+	}
+	return 0;
 }
 
 float UAbility::GetTimeUntilReady()

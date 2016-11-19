@@ -52,20 +52,39 @@ public:
 
 	void Cancel();
 
-	UPROPERTY(EditAnywhere, Category = AbilityState)
+	UFUNCTION(BlueprintCallable, Category = Stats)
+	void LevelUp();
+
+	virtual bool CanLevelUp();
+
 	EAbilityStateEnum State;
 
-	UPROPERTY(EditAnywhere, Category = Timers)
+	UPROPERTY(EditDefaultsOnly, Category = Timers)
 	float ReloadingTime;
 
-	UPROPERTY(Replicated, EditAnywhere, Category = AbilityCost)
-	float ManaCost;
+	UPROPERTY(Replicated, EditDefaultsOnly, Category = AbilityCost)
+	float Level1ManaCost;
+
+	UPROPERTY(Replicated, EditDefaultsOnly, Category = AbilityCost)
+	float Level2ManaCost;
+
+	UPROPERTY(Replicated, EditDefaultsOnly, Category = AbilityCost)
+	float Level3ManaCost;
+
+	UPROPERTY(Replicated, EditDefaultsOnly, Category = AbilityCost)
+	float Level4ManaCost;
+
+	UFUNCTION(BlueprintCallable, Category = Stats)
+	float GetModifiedManaCost();
 
 	UFUNCTION(BlueprintCallable, Category = Timers)
 	float GetTimeUntilReady();
 
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadOnly, Category = GUI)
 	class UTexture2D* Icon;
+
+	UPROPERTY(Replicated, BlueprintReadOnly)
+	int Level;
 
 	UPROPERTY(Replicated)
 	bool Reloaded;

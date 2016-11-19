@@ -28,9 +28,12 @@ void UMobaProjectileAbility::OnCast()
 				FVector forward = myPlayer->GetActorForwardVector();
 
 				//offset projectile spawn by a few
-				mTransform.SetLocation(vec + forward * 2);
+				mTransform.SetLocation(vec);
 				//just aim where the camera is pointing
-				mTransform.SetRotation(ClientData.CamFrwd.Quaternion());
+				//mTransform.SetRotation(ClientData.AimingRotation.Quaternion());
+
+				FVector targetVec = ClientData.AimingPosition - mTransform.GetLocation();
+				mTransform.SetRotation(targetVec.Rotation().Quaternion());
 
 				FActorSpawnParameters spawnParams;
 				spawnParams.Owner = GetOwner();

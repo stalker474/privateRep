@@ -11,6 +11,7 @@ AStrategyBuilding_Brewery::AStrategyBuilding_Brewery(const FObjectInitializer& O
 	PrimaryActorTick.bCanEverTick = true;
 
 	AIDirector = CreateDefaultSubobject<UStrategyAIDirector>(TEXT("AIDirectorComp"));
+	AIDirector->SetIsReplicated(false);
 }
 
 void AStrategyBuilding_Brewery::PostInitializeComponents()
@@ -52,13 +53,12 @@ FText AStrategyBuilding_Brewery::GetSpawnQueueLength() const
 
 bool AStrategyBuilding_Brewery::SpawnDwarf()
 {
-	if (Role == ROLE_Authority)
+
+	FPlayerData* const MyData = GetTeamData();
+	if (MyData && AIDirector != nullptr)
 	{
-		FPlayerData* const MyData = GetTeamData();
-		if (MyData && AIDirector != nullptr)
-		{
-			AIDirector->RequestSpawn();
-		}
+		AIDirector->RequestSpawn();
 	}
+
 	return false;
 }

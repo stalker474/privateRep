@@ -45,8 +45,8 @@ class AStrategyBuilding : public APawn, public IStrategyTeamInterface
 	//////////////////////////////////////////////////////////////////////////
 	// Reading data
 
-	UFUNCTION(Client,Reliable)
-	void CLIENT_Deactivate();
+	UFUNCTION(NetMultiCast,Reliable)
+	void MULTICAST_Deactivate();
 
 	/** get building's name */
 	FString GetBuildingName() const;

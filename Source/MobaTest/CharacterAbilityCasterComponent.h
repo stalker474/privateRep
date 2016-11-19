@@ -45,6 +45,9 @@ public:
 	UFUNCTION(Reliable, NetMulticast)
 	void MULTICAST_LaunchAbility(const int AbilityIndex);
 
+	UFUNCTION(BlueprintCallable, Category = Stats)
+	float GetModifiedMana();
+
 	FAbilityClientData ClientLaunchAbility(const int AbilityIndex);
 
 	UAbility * GetAbilityByIndex(const int Index);
@@ -100,11 +103,14 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = Animation)
 	UAnimMontage* Ability4Animation;
 
-	UPROPERTY(Replicated, EditAnywhere, BlueprintReadOnly, Category = Stats)
-	float MaxMana;
+	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadOnly, Category = Stats)
+	float BaseMana;
 
-	UPROPERTY(Replicated, EditAnywhere, BlueprintReadOnly, Category = Stats)
+	UPROPERTY(Replicated, BlueprintReadOnly)
 	float Mana;
+
+	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadOnly, Category = Stats)
+	float ManaLevelBonus;
 
 	void LaunchAbility(const int AbilityIndex);
 

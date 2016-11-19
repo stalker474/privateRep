@@ -13,10 +13,6 @@ AMobaTestCharacter::AMobaTestCharacter()
 
 	bReplicates = true;
 
-	// set our turn rates for input
-	BaseTurnRate = 45.f;
-	BaseLookUpRate = 45.f;
-
 	// Don't rotate when the controller rotates. Let that just affect the camera.
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = true;
@@ -24,9 +20,7 @@ AMobaTestCharacter::AMobaTestCharacter()
 
 	// Configure character movement
 	GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...	
-	GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f); // ...at this rotation rate
 	GetCharacterMovement()->JumpZVelocity = 400.f;
-	GetCharacterMovement()->AirControl = 0.2f;
 
 	// Create a camera boom (pulls in towards the player if there is a collision)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
@@ -43,6 +37,11 @@ AMobaTestCharacter::AMobaTestCharacter()
 
 	CombatCharacterComponent = CreateDefaultSubobject<UMobaCombatCharacterComponent>(TEXT("Combat component"));
 
+	Level = 1;
+	Experience = 0;
+
+	MyTeamNum = EStrategyTeam::Player;
+
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
 }
@@ -52,6 +51,9 @@ void AMobaTestCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > 
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(AMobaTestCharacter, Icon);
+	DOREPLIFETIME(AMobaTestCharacter, Level);
+	DOREPLIFETIME(AMobaTestCharacter, Experience);
+	DOREPLIFETIME(AMobaTestCharacter, MyTeamNum);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -65,23 +67,12 @@ void AMobaTestCharacter::SetupPlayerInputComponent(class UInputComponent* InputC
 	AbilitySlot->SetupPlayerInputComponent(InputComponent);
 	InputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	InputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
-
-	InputComponent->BindAxis("MoveForward", this, &AMobaTestCharacter::MoveForward);
-	InputComponent->BindAxis("MoveRight", this, &AMobaTestCharacter::MoveRight);
-
-	// We have 2 versions of the rotation bindings to handle different kinds of devices differently
-	// "turn" handles devices that provide an absolute delta, such as a mouse.
-	// "turnrate" is for devices that we choose to treat as a rate of change, such as an analog joystick
 	InputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
 	InputComponent->BindAxis("TurnRate", this, &AMobaTestCharacter::TurnAtRate);
 	InputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 	InputComponent->BindAxis("LookUpRate", this, &AMobaTestCharacter::LookUpAtRate);
-}
-
-float AMobaTestCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)
-{
-	CombatCharacterComponent->ApplyDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	InputComponent->BindAxis("MoveForward", this, &AMobaTestCharacter::MoveForward);
+	InputComponent->BindAxis("MoveRight", this, &AMobaTestCharacter::MoveRight);
 }
 
 void AMobaTestCharacter::TurnAtRate(float Rate)
@@ -96,6 +87,12 @@ void AMobaTestCharacter::LookUpAtRate(float Rate)
 	AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
 }
 
+float AMobaTestCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)
+{
+	CombatCharacterComponent->ApplyDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+}
+
 void AMobaTestCharacter::MoveForward(float Value)
 {
 	if ((Controller != NULL) && (Value != 0.0f))
@@ -108,10 +105,6 @@ void AMobaTestCharacter::MoveForward(float Value)
 		// get forward vector
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 
-		/*if (!AbilitySlot->IsAgressive() || (AbilitySlot->IsAgressive() && Value > 0.0f))
-			GetCharacterMovement()->bOrientRotationToMovement = true;
-		else
-			GetCharacterMovement()->bOrientRotationToMovement = false;*/
 		AddMovementInput(Direction, Value);
 	}
 }
@@ -131,4 +124,17 @@ void AMobaTestCharacter::MoveRight(float Value)
 		// add movement in that direction
 		AddMovementInput(Direction, Value);
 	}
+}
+
+void AMobaTestCharacter::LevelUp_Implementation()
+{
+	if (Level < 20)
+	{
+		Level++;
+	}	
+}
+
+bool AMobaTestCharacter::LevelUp_Validate()
+{
+	return (Level < 20);
 }

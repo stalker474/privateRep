@@ -6,6 +6,7 @@
 #include "MobaCombatCharacterComponent.h"
 #include "MobaProjectileAbility.h"
 #include "MobaAreaDamageAbility.h"
+#include "MobaTestCharacter.h"
 
 
 // Sets default values for this component's properties
@@ -17,6 +18,7 @@ UCharacterAbilityCasterComponent::UCharacterAbilityCasterComponent(const FObject
 	bWantsInitializeComponent = true;
 	PrimaryComponentTick.bCanEverTick = true;
 	bReplicates = true;
+	ManaLevelBonus = 1.0f;
 }
 
 void UCharacterAbilityCasterComponent::InitializeComponent()
@@ -54,14 +56,17 @@ void UCharacterAbilityCasterComponent::InitializeComponent()
 			Ability4 = NewObject<UAbility>(GetOwner(), Ability4Class);
 			Ability4->RegisterComponent();
 		}
+
+		Mana = BaseMana;
 	}
 }
 
 void UCharacterAbilityCasterComponent::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	DOREPLIFETIME(UCharacterAbilityCasterComponent, MaxMana);
+	DOREPLIFETIME(UCharacterAbilityCasterComponent, BaseMana);
 	DOREPLIFETIME(UCharacterAbilityCasterComponent, Mana);
+	DOREPLIFETIME(UCharacterAbilityCasterComponent, ManaLevelBonus);
 	DOREPLIFETIME(UCharacterAbilityCasterComponent, DefaultAbility);
 	DOREPLIFETIME(UCharacterAbilityCasterComponent, Ability1);
 	DOREPLIFETIME(UCharacterAbilityCasterComponent, Ability2);
@@ -92,7 +97,7 @@ void UCharacterAbilityCasterComponent::ServerLaunchAbility_Implementation(const 
 
 	if (GetOwnerRole() == ROLE_Authority)
 	{
-		Mana -= ability->ManaCost;
+		Mana -= ability->GetModifiedManaCost();
 		ability->StartCast(0.1f); // no need to wait right now
 		MULTICAST_LaunchAbility(AbilityIndex);
 	}
@@ -127,6 +132,7 @@ FAbilityClientData UCharacterAbilityCasterComponent::ClientLaunchAbility(const i
 
 		controller->PlayerCameraManager->GetCameraViewPoint(camLocation, camRotation);
 		data.CamFrwd = camRotation;
+		data.AimingRotation = camRotation;
 
 		TWeakObjectPtr<UMobaAreaDamageAbility> areaAbility = Cast<UMobaAreaDamageAbility>(ability);
 		if (areaAbility.IsValid())
@@ -134,6 +140,31 @@ FAbilityClientData UCharacterAbilityCasterComponent::ClientLaunchAbility(const i
 			data.AimingPosition = areaAbility.Get()->TargetActor->GetActorLocation();
 			data.AimingRotation = areaAbility.Get()->TargetActor->GetActorRotation();
 		}
+		else
+		{
+			FHitResult hit;
+			FCollisionQueryParams traceParams(FName(TEXT("VictoreCore Trace")), true, GetOwner());
+			traceParams.bTraceComplex = false;
+
+			const ULocalPlayer* LocalPlayer = controller->GetLocalPlayer();
+			FViewport* Viewport = LocalPlayer->ViewportClient->Viewport;
+			FVector2D ViewportSize;
+			LocalPlayer->ViewportClient->GetViewportSize(ViewportSize);
+			const int32 X = static_cast<int32>(ViewportSize.X * 0.5f);
+			const int32 Y = static_cast<int32>(ViewportSize.Y * 0.5f);
+			FVector2D pos(X, Y);
+			controller->GetHitResultAtScreenPosition(pos, ECollisionChannel::ECC_Destructible, traceParams, hit);
+
+			if (hit.Actor.IsValid())
+			{
+				data.AimingPosition = hit.ImpactPoint;
+			}
+			else
+				data.AimingPosition = GetOwner()->GetActorLocation() + data.CamFrwd.Vector();
+				
+		}
+
+		ability->OnCast();
 	}
 	return data;
 }
@@ -164,10 +195,22 @@ void UCharacterAbilityCasterComponent::LaunchAbility(const int AbilityIndex)
 	if (GetOwnerRole() != ROLE_Authority)
 	{
 		UAbility * ability = GetAbilityByIndex(AbilityIndex);
-		if (ability != nullptr && ability->GetTimeUntilReady() == 0.0f && ability->ManaCost <= Mana)
+		if (ability != nullptr && ability->GetTimeUntilReady() == 0.0f && ability->GetModifiedManaCost() <= Mana)
 		{
 			if (ability->State == EAbilityStateEnum::NONE)
+			{
+				for (int i = 1; i <= 4; ++i)
+				{
+					if (i != AbilityIndex)
+					{
+						if (GetAbilityByIndex(i)->State == EAbilityStateEnum::AIMING)
+							GetAbilityByIndex(i)->Cancel();
+					}
+						
+				}
 				ability->Aim();
+			}
+				
 			else if (ability->State == EAbilityStateEnum::AIMING)
 			{
 				FAbilityClientData clientData = ClientLaunchAbility(AbilityIndex);
@@ -270,5 +313,12 @@ void UCharacterAbilityCasterComponent::TickComponent( float DeltaTime, ELevelTic
 	Super::TickComponent( DeltaTime, TickType, ThisTickFunction );
 
 	// ...
+}
+
+float UCharacterAbilityCasterComponent::GetModifiedMana()
+{
+	AMobaTestCharacter * character = Cast<AMobaTestCharacter>(GetOwner());
+	int Level = character->Level;
+	return Level == 1?BaseMana: BaseMana * (ManaLevelBonus * Level);
 }
 

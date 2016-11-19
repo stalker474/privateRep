@@ -71,10 +71,10 @@ void AStrategyBuilding::Destroyed()
 void AStrategyBuilding::Deactivate()
 {
 	Active = false;
-	CLIENT_Deactivate();
+	MULTICAST_Deactivate();
 }
 
-void AStrategyBuilding::CLIENT_Deactivate_Implementation()
+void AStrategyBuilding::MULTICAST_Deactivate_Implementation()
 {
 	ParticleComp->ActivateSystem(true);
 }

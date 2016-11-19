@@ -11,7 +11,7 @@ DEFINE_LOG_CATEGORY(LogGame);
 UStrategyAIDirector::UStrategyAIDirector(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 	, WaveSize(8)
-	, RadiusToSpawnOn(10)
+	, RadiusToSpawnOn(0)
 	, CustomScale(1.0)
 	, AnimationRate(1)
 	, NextSpawnTime(0)
@@ -236,12 +236,14 @@ void UStrategyAIDirector::RequestSpawn()
 void UStrategyAIDirector::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	TimeSinceLastSpawn += DeltaTime;
-	if (TimeSinceLastSpawn >= TimeBetweenSpawns)
+	if (GetOwnerRole() == ROLE_Authority)
 	{
-		TimeSinceLastSpawn = 0.0f;
-		LeftToSpawn = WaveSize;
+		TimeSinceLastSpawn += DeltaTime;
+		if (TimeSinceLastSpawn >= TimeBetweenSpawns)
+		{
+			TimeSinceLastSpawn = 0.0f;
+			LeftToSpawn = WaveSize;
+		}
+		SpawnMinions();
 	}
-	SpawnMinions();
-	
 }

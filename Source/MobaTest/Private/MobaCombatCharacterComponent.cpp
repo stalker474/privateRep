@@ -4,6 +4,7 @@
 #include "MobaAreaEffect.h"
 #include "MobaCombatCharacterComponent.h"
 #include "StrategyChar.h"
+#include "MobaTestCharacter.h"
 
 // Sets default values for this component's properties
 UMobaCombatCharacterComponent::UMobaCombatCharacterComponent(const FObjectInitializer& ObjectInitializer)
@@ -14,6 +15,7 @@ UMobaCombatCharacterComponent::UMobaCombatCharacterComponent(const FObjectInitia
 	bWantsInitializeComponent = true;
 	PrimaryComponentTick.bCanEverTick = true;
 	bReplicates = true;
+	HealthLevelBonus = 1.0f;
 }
 
 // Called when the game starts
@@ -25,11 +27,22 @@ void UMobaCombatCharacterComponent::BeginPlay()
 	
 }
 
+void UMobaCombatCharacterComponent::InitializeComponent()
+{
+	Super::InitializeComponent();
+
+	if (GetOwnerRole() == ROLE_Authority)
+	{
+		Health = BaseHealth;
+	}
+}
+
 void UMobaCombatCharacterComponent::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	DOREPLIFETIME(UMobaCombatCharacterComponent, MaxHealth);
+	DOREPLIFETIME(UMobaCombatCharacterComponent, BaseHealth);
 	DOREPLIFETIME(UMobaCombatCharacterComponent, Health);
+	DOREPLIFETIME(UMobaCombatCharacterComponent, HealthLevelBonus);
 }
 
 
@@ -68,5 +81,14 @@ float UMobaCombatCharacterComponent::ApplyDamage(float DamageAmount, struct FDam
 		//GetWorld()->GetTimerManager().SetTimer()
 	}
 	return DamageAmount;
+}
+float UMobaCombatCharacterComponent::GetModifiedHealth()
+{
+	int Level = 1;
+	AMobaTestCharacter * character = Cast<AMobaTestCharacter>(GetOwner());
+	AStrategyChar * holop = Cast<AStrategyChar>(GetOwner());
+	if (character)
+		Level = character->Level;
+	return  Level == 1 ? BaseHealth : BaseHealth * (HealthLevelBonus * Level);
 }
 
