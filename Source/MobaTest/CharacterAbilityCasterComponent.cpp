@@ -65,8 +65,13 @@ void UCharacterAbilityCasterComponent::GetLifetimeReplicatedProps(TArray< FLifet
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(UCharacterAbilityCasterComponent, BaseMana);
+	DOREPLIFETIME(UCharacterAbilityCasterComponent, BaseManaRegen);
 	DOREPLIFETIME(UCharacterAbilityCasterComponent, Mana);
 	DOREPLIFETIME(UCharacterAbilityCasterComponent, ManaLevelBonus);
+	DOREPLIFETIME(UCharacterAbilityCasterComponent, ManaRegenLevelBonus);
+	DOREPLIFETIME(UCharacterAbilityCasterComponent, BasePower);
+	DOREPLIFETIME(UCharacterAbilityCasterComponent, BaseAttackSpeed);
+	DOREPLIFETIME(UCharacterAbilityCasterComponent, BaseStrength);
 	DOREPLIFETIME(UCharacterAbilityCasterComponent, DefaultAbility);
 	DOREPLIFETIME(UCharacterAbilityCasterComponent, Ability1);
 	DOREPLIFETIME(UCharacterAbilityCasterComponent, Ability2);
@@ -113,6 +118,11 @@ void UCharacterAbilityCasterComponent::MULTICAST_LaunchAbility_Implementation(co
 	UAnimMontage * montage = GetAnimationByIndex(AbilityIndex);
 	ACharacter * myChar = Cast<ACharacter>(GetOwner());
 	myChar->PlayAnimMontage(montage);
+}
+
+float UCharacterAbilityCasterComponent::GetModifiedPower()
+{
+	return BasePower;
 }
 
 FAbilityClientData UCharacterAbilityCasterComponent::ClientLaunchAbility(const int AbilityIndex)
@@ -188,6 +198,16 @@ void UCharacterAbilityCasterComponent::LaunchDefaultAbility()
 			ServerLaunchAbility(0, clientData);
 		}
 	}
+}
+
+float UCharacterAbilityCasterComponent::GetModifiedAttackSpeed()
+{
+	return BaseAttackSpeed;
+}
+
+float UCharacterAbilityCasterComponent::GetModifiedStrength()
+{
+	return BaseStrength;
 }
 
 void UCharacterAbilityCasterComponent::LaunchAbility(const int AbilityIndex)
@@ -311,14 +331,36 @@ void UCharacterAbilityCasterComponent::BeginPlay()
 void UCharacterAbilityCasterComponent::TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction )
 {
 	Super::TickComponent( DeltaTime, TickType, ThisTickFunction );
-
+	if (GetOwnerRole() == ROLE_Authority)
+	{
+		if (Mana < GetModifiedMana())
+		{
+			Mana += GetModifiedManaRegen() * DeltaTime;
+			if (Mana > GetModifiedMana())
+			{
+				Mana = GetModifiedMana();
+			}
+		}
+			
+	}
 	// ...
 }
 
 float UCharacterAbilityCasterComponent::GetModifiedMana()
 {
-	AMobaTestCharacter * character = Cast<AMobaTestCharacter>(GetOwner());
-	int Level = character->Level;
+	int Level = 1;
+	const AMobaTestCharacter * character = Cast<AMobaTestCharacter>(GetOwner());
+	if(character)
+		Level = character->GetLevel();
 	return Level == 1?BaseMana: BaseMana * (ManaLevelBonus * Level);
+}
+
+float UCharacterAbilityCasterComponent::GetModifiedManaRegen()
+{
+	int Level = 1;
+	const AMobaTestCharacter * character = Cast<AMobaTestCharacter>(GetOwner());
+	if (character)
+		Level = character->GetLevel();
+	return Level == 1 ? BaseManaRegen : BaseManaRegen * (ManaRegenLevelBonus * Level);
 }
 

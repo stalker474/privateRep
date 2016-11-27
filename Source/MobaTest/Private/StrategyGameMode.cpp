@@ -6,6 +6,7 @@
 #include "StrategyTeamInterface.h"
 #include "MobaTestCharacter.h"
 #include "StrategySpawnPoint.h"
+#include "MobaPlayerState.h"
 
 
 AStrategyGameMode::AStrategyGameMode(const FObjectInitializer& ObjectInitializer)
@@ -19,6 +20,8 @@ AStrategyGameMode::AStrategyGameMode(const FObjectInitializer& ObjectInitializer
 	{
 		DefaultPawnClass = PlayerPawnBPClass.Class;
 	}
+
+	PlayerStateClass = AMobaPlayerState::StaticClass();
 
 	/*static ConstructorHelpers::FClassFinder<AStrategyBuilding> EmptyWallSlotHelper(TEXT("/Game/Buildings/Wall/Wall_EmptySlot"));
 	EmptyWallSlotClass = EmptyWallSlotHelper.Class;

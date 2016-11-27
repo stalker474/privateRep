@@ -5,6 +5,7 @@
 #include "CombatAnimatedInterface.h"
 #include "CharacterAbilityCasterComponent.h"
 #include "MobaCombatCharacterComponent.h"
+#include "MobaItem.h"
 #include "MobaTestCharacter.generated.h"
 
 
@@ -12,7 +13,7 @@
 UCLASS(config=Game)
 class AMobaTestCharacter : public ACharacter, public IStrategyTeamInterface
 {
-	GENERATED_BODY()
+	GENERATED_UCLASS_BODY()
 
 	/** Camera boom positioning the camera behind the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
@@ -22,7 +23,11 @@ class AMobaTestCharacter : public ACharacter, public IStrategyTeamInterface
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* FollowCamera;
 public:
-	AMobaTestCharacter();
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
+	UFUNCTION(BlueprintCallable, Category = "Status")
+	bool IsReady();
 
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
@@ -38,33 +43,49 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = CombatStats)
 	class UMobaCombatCharacterComponent * CombatCharacterComponent;
 
-	UPROPERTY(Replicated, EditAnywhere, BlueprintReadOnly, Category = GUI)
+	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadOnly, Category = GUI)
 	class UTexture2D* Icon;
 
-	UPROPERTY(Replicated, BlueprintReadOnly)
-	int Level;
+	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadOnly)
+	float BaseSpeed;
 
-	UPROPERTY(Replicated, BlueprintReadOnly)
-	int Experience;
+	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadOnly, Category = Effects)
+	TArray<UTickEffect*> TickEffects;
 
-	UFUNCTION(Server, Reliable,BlueprintCallable, WithValidation, Category = "Team")
-	void LevelUp();
-	
+	UFUNCTION(BlueprintCallable, Category = "Effects")
+	TArray<UTickEffect*> GetTickEffects() const;
+
+	UFUNCTION()
+	void AddTickEffect(TSubclassOf<class UTickEffect> EffectClass);
+
+	UFUNCTION(BlueprintCallable, Category = "Items")
+	UMobaItem* GetItem(EItemSlot Slot) const;
+
+	UFUNCTION(BlueprintCallable, Category = "Stats")
+	float GetModifiedSpeed();
+
+	UFUNCTION(BlueprintCallable, Category = "Stats")
+	int GetLevel() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Stats")
+	int GetExperience() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Money")
+	int GetMoney() const;
+
 	float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
 	/* IStrategyTeamInterface
 	*/
 	UFUNCTION(BlueprintCallable, Category = "Team")
-	uint8 GetTeamNum() const { return MyTeamNum; };
+	uint8 GetTeamNum() const override;
 
 	/* End IStrategyTeamInterface
 	*/
 
 protected:
 
-	/** team number */
-	UPROPERTY(Replicated)
-	uint8 MyTeamNum;
+	void ApplyItemEffects();
 
 	/** Called for forwards/backward input */
 	void MoveForward(float Value);

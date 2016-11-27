@@ -6,7 +6,7 @@
 
 DEFINE_LOG_CATEGORY(TickEffectLog);
 
-UTickEffect::UTickEffect(const FObjectInitializer& ObjectInitializer)
+UTickEffect::UTickEffect(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	Duration = 0.0f;
 	ApplyEveryDt = 0.0f;
@@ -26,13 +26,14 @@ UTickEffect::UTickEffect(const FObjectInitializer& ObjectInitializer)
 	IsOver = false;
 	DamageType = nullptr;
 	AppliedOnce = false;
+	Invulnerable = false;
 }
 
 void UTickEffect::Apply(float dT)
 {
 	TotalElapsedTime += dT;
 	TimeSinceLastTick += dT;
-	if (TotalElapsedTime > Duration)
+	if (TotalElapsedTime > Duration && Duration != 0)
 	{
 		IsOver = true;
 		//restore values

@@ -32,6 +32,8 @@ class AStrategyGameMode : public AGameMode
 	  */
 	virtual float ModifyDamage(float Damage, AActor* DamagedActor, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) const;
 
+	
+
 	// End GameMode interface
 
 	/** 

@@ -21,10 +21,16 @@ public:
 
 	void InitializeComponent() override;
 
+	UFUNCTION(BlueprintCallable, Category = Damage)
+	float GetModifiedDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser);
+
 	float ApplyDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser);
 
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadOnly, Category = Stats)
 	float BaseHealth;
+
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadOnly, Category = Stats)
+	float BaseHealthRegen;
 
 	UPROPERTY(Replicated, BlueprintReadOnly, Category = Stats)
 	float Health;
@@ -32,10 +38,26 @@ public:
 	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadOnly, Category = Stats)
 	float HealthLevelBonus;
 
+	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadOnly, Category = Stats)
+	float HealthRegenLevelBonus;
+
+	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadOnly, Category = Stats)
+	float BaseMagicDefense;
+
+	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadOnly, Category = Stats)
+	float BasePhysicalDefense;
+
 	UFUNCTION(BlueprintCallable, Category = Stats)
 	float GetModifiedHealth();
 
-	UParticleSystemComponent * ParticleSystem;
+	UFUNCTION(BlueprintCallable, Category = Stats)
+	float GetModifiedHealthRegen();
 
-	TArray<UTickEffect*> TickEffects;
+	UFUNCTION(BlueprintCallable, Category = Stats)
+	float GetModifiedMagicDefense();
+
+	UFUNCTION(BlueprintCallable, Category = Stats)
+	float GetModifiedPhysicalDefense();
+
+	UParticleSystemComponent * ParticleSystem;
 };

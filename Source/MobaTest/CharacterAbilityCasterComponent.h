@@ -45,9 +45,6 @@ public:
 	UFUNCTION(Reliable, NetMulticast)
 	void MULTICAST_LaunchAbility(const int AbilityIndex);
 
-	UFUNCTION(BlueprintCallable, Category = Stats)
-	float GetModifiedMana();
-
 	FAbilityClientData ClientLaunchAbility(const int AbilityIndex);
 
 	UAbility * GetAbilityByIndex(const int Index);
@@ -106,11 +103,41 @@ protected:
 	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadOnly, Category = Stats)
 	float BaseMana;
 
+	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadOnly, Category = Stats)
+	float BaseManaRegen;
+
 	UPROPERTY(Replicated, BlueprintReadOnly)
 	float Mana;
 
 	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadOnly, Category = Stats)
 	float ManaLevelBonus;
+
+	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadOnly, Category = Stats)
+	float ManaRegenLevelBonus;
+
+	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadOnly, Category = Stats)
+	float BasePower;
+
+	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadOnly, Category = Stats)
+	float BaseStrength;
+
+	UFUNCTION(BlueprintCallable, Category = Stats)
+	float GetModifiedAttackSpeed();
+
+	UPROPERTY(Replicated, BlueprintReadOnly)
+	float BaseAttackSpeed;
+
+	UFUNCTION(BlueprintCallable, Category = Stats)
+	float GetModifiedMana();
+
+	UFUNCTION(BlueprintCallable, Category = Stats)
+	float GetModifiedManaRegen();
+
+	UFUNCTION(BlueprintCallable, Category = Stats)
+	float GetModifiedPower();
+
+	UFUNCTION(BlueprintCallable, Category = Stats)
+	float GetModifiedStrength();
 
 	void LaunchAbility(const int AbilityIndex);
 

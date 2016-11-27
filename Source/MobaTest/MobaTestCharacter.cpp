@@ -2,11 +2,12 @@
 
 #include "MobaTest.h"
 #include "MobaTestCharacter.h"
+#include "MobaPlayerState.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AMobaTestCharacter
 
-AMobaTestCharacter::AMobaTestCharacter()
+AMobaTestCharacter::AMobaTestCharacter(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
@@ -21,6 +22,7 @@ AMobaTestCharacter::AMobaTestCharacter()
 	// Configure character movement
 	GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...	
 	GetCharacterMovement()->JumpZVelocity = 400.f;
+	GetCharacterMovement()->MaxWalkSpeed = BaseSpeed;
 
 	// Create a camera boom (pulls in towards the player if there is a collision)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
@@ -28,6 +30,7 @@ AMobaTestCharacter::AMobaTestCharacter()
 	CameraBoom->TargetArmLength = 300.0f; // The camera follows at this distance behind the character	
 	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
 	CameraBoom->bDoCollisionTest = true;
+	CameraBoom->ProbeChannel = ECC_WorldStatic;
 
 	// Create a follow camera
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
@@ -38,11 +41,6 @@ AMobaTestCharacter::AMobaTestCharacter()
 
 	CombatCharacterComponent = CreateDefaultSubobject<UMobaCombatCharacterComponent>(TEXT("Combat component"));
 
-	Level = 1;
-	Experience = 0;
-
-	MyTeamNum = EStrategyTeam::Player;
-
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
 }
@@ -52,9 +50,8 @@ void AMobaTestCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > 
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(AMobaTestCharacter, Icon);
-	DOREPLIFETIME(AMobaTestCharacter, Level);
-	DOREPLIFETIME(AMobaTestCharacter, Experience);
-	DOREPLIFETIME(AMobaTestCharacter, MyTeamNum);
+	DOREPLIFETIME(AMobaTestCharacter, BaseSpeed);
+	DOREPLIFETIME(AMobaTestCharacter, TickEffects);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -88,17 +85,117 @@ void AMobaTestCharacter::LookUpAtRate(float Rate)
 	AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
 }
 
+bool AMobaTestCharacter::IsReady()
+{
+	AMobaPlayerState * ps = Cast<AMobaPlayerState>(PlayerState);
+	return ps != nullptr;
+}
+
+// Called every frame
+void AMobaTestCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	if (Role == ROLE_Authority)
+	{
+		TickEffects.RemoveAll([](UTickEffect* effect) { return !effect->GetIsActive();});
+		ApplyItemEffects();
+	}
+}
+
+void AMobaTestCharacter::ApplyItemEffects()
+{
+	UMobaItem * item1 = GetItem(EItemSlot::SLOT_1);
+	UMobaItem * item2 = GetItem(EItemSlot::SLOT_2);
+	UMobaItem * item3 = GetItem(EItemSlot::SLOT_3);
+	UMobaItem * item4 = GetItem(EItemSlot::SLOT_4);
+	UMobaItem * item5 = GetItem(EItemSlot::SLOT_5);
+	UMobaItem * item6 = GetItem(EItemSlot::SLOT_6);
+
+	if (item1)
+		item1->Apply(TickEffects);
+	if (item2)
+		item2->Apply(TickEffects);
+	if (item3)
+		item3->Apply(TickEffects);
+	if (item4)
+		item4->Apply(TickEffects);
+	if (item5)
+		item5->Apply(TickEffects);
+	if (item6)
+		item6->Apply(TickEffects);
+}
+
+TArray<UTickEffect*> AMobaTestCharacter::GetTickEffects() const
+{
+	return TickEffects;
+}
+
+void AMobaTestCharacter::AddTickEffect(TSubclassOf<class UTickEffect> EffectClass)
+{
+	UTickEffect * effect = NewObject<UTickEffect>(this,EffectClass);
+	effect->SetOwner(CombatCharacterComponent);
+	TickEffects.Add(effect);
+}
+
+UMobaItem* AMobaTestCharacter::GetItem(EItemSlot Slot) const
+{
+	const AMobaPlayerState * CurrentState = Cast<AMobaPlayerState>(PlayerState);
+	if (CurrentState)
+		return CurrentState->GetItem(Slot);
+	else
+		return nullptr;
+}
+
+float AMobaTestCharacter::GetModifiedSpeed()
+{
+	return BaseSpeed;
+}
+
+int AMobaTestCharacter::GetLevel() const
+{
+	const AMobaPlayerState * CurrentState = Cast<AMobaPlayerState>(PlayerState);
+	if (CurrentState)
+		return CurrentState->GetLevel();
+	else
+		return 0;
+}
+
+int AMobaTestCharacter::GetExperience() const
+{
+	const AMobaPlayerState * CurrentState = Cast<AMobaPlayerState>(PlayerState);
+	if (CurrentState)
+		return CurrentState->GetExperience();
+	else
+		return 0;
+}
+
+int AMobaTestCharacter::GetMoney() const
+{
+	const AMobaPlayerState * CurrentState = Cast<AMobaPlayerState>(PlayerState);
+	if (CurrentState)
+		return CurrentState->GetMoney();
+	else
+		return 0;
+}
+
 float AMobaTestCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)
 {
-	CombatCharacterComponent->ApplyDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	return CombatCharacterComponent->ApplyDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+}
+
+uint8 AMobaTestCharacter::GetTeamNum() const
+{
+	const AMobaPlayerState * CurrentState = Cast<AMobaPlayerState>(PlayerState);
+	if (CurrentState)
+		return CurrentState->GetTeam();
+	else
+		return 0;
 }
 
 void AMobaTestCharacter::MoveForward(float Value)
 {
 	if ((Controller != NULL) && (Value != 0.0f))
 	{
-		
 		// find out which way is forward
 		const FRotator Rotation = Controller->GetControlRotation();
 		const FRotator YawRotation(0, Rotation.Yaw, 0);
@@ -125,17 +222,4 @@ void AMobaTestCharacter::MoveRight(float Value)
 		// add movement in that direction
 		AddMovementInput(Direction, Value);
 	}
-}
-
-void AMobaTestCharacter::LevelUp_Implementation()
-{
-	if (Level < 20)
-	{
-		Level++;
-	}	
-}
-
-bool AMobaTestCharacter::LevelUp_Validate()
-{
-	return (Level < 20);
 }
