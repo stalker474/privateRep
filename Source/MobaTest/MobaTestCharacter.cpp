@@ -99,6 +99,8 @@ void AMobaTestCharacter::Tick(float DeltaTime)
 	{
 		TickEffects.RemoveAll([](UTickEffect* effect) { return !effect->GetIsActive();});
 		ApplyItemEffects();
+		if(GetCharacterMovement()->MaxWalkSpeed != GetModifiedSpeed())
+			GetCharacterMovement()->MaxWalkSpeed = GetModifiedSpeed();
 	}
 }
 
