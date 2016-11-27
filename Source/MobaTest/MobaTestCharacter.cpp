@@ -148,6 +148,15 @@ UMobaItem* AMobaTestCharacter::GetItem(EItemSlot Slot) const
 		return nullptr;
 }
 
+UMobaItem* AMobaTestCharacter::GetActiveItem(EActiveItemSlot Slot) const
+{
+	const AMobaPlayerState * CurrentState = Cast<AMobaPlayerState>(PlayerState);
+	if (CurrentState)
+		return CurrentState->GetActiveItem(Slot);
+	else
+		return nullptr;
+}
+
 float AMobaTestCharacter::GetModifiedSpeed()
 {
 	return BaseSpeed;

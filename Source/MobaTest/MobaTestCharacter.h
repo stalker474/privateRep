@@ -61,6 +61,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Items")
 	UMobaItem* GetItem(EItemSlot Slot) const;
 
+	UFUNCTION(BlueprintCallable, Category = "Items")
+	UMobaItem* GetActiveItem(EActiveItemSlot Slot) const;
+
 	UFUNCTION(BlueprintCallable, Category = "Stats")
 	float GetModifiedSpeed();
 

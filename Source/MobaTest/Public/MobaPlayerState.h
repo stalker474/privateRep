@@ -40,11 +40,23 @@ public:
 	UFUNCTION()
 	UMobaItem* GetActiveItem(EActiveItemSlot Slot) const;
 
-	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable, Category = "Items")
+	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable, Category = "Shop")
 	void BuyItem(TSubclassOf<class UMobaItem> ItemClass);
 
-	/*UFUNCTION(Client,Reliable)
-	void ClientUpdateItems()*/
+	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable, Category = "Shop")
+	void SellItem(EItemSlot Slot);
+
+	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable, Category = "Shop")
+	void SellActiveItem(EActiveItemSlot Slot);
+
+	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable, Category = "Actions")
+	void ActivateItem(EActiveItemSlot Slot);
+
+	UFUNCTION()
+	void EmptySlot(EItemSlot Slot);
+
+	UFUNCTION()
+	void EmptyActiveSlot(EActiveItemSlot Slot);
 
 
 	UPROPERTY(Replicated, BlueprintReadOnly, Category = "Item shop")

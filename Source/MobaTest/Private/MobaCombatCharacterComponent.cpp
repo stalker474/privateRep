@@ -137,7 +137,7 @@ float UMobaCombatCharacterComponent::GetModifiedHealth()
 	AStrategyChar * holop = Cast<AStrategyChar>(GetOwner());
 	if (character)
 		Level = character->GetLevel();
-	return  Level == 1 ? BaseHealth : BaseHealth * (HealthLevelBonus * Level);
+	return  Level == 1 ? BaseHealth : BaseHealth + (BaseHealth * HealthLevelBonus * Level);
 }
 
 float UMobaCombatCharacterComponent::GetModifiedHealthRegen()
@@ -147,7 +147,7 @@ float UMobaCombatCharacterComponent::GetModifiedHealthRegen()
 	AStrategyChar * holop = Cast<AStrategyChar>(GetOwner());
 	if (character)
 		Level = character->GetLevel();
-	return  Level == 1 ? BaseHealthRegen : BaseHealthRegen * (HealthRegenLevelBonus * Level);
+	return  Level == 1 ? BaseHealthRegen : BaseHealthRegen + (BaseHealthRegen * HealthRegenLevelBonus * Level);
 }
 
 float UMobaCombatCharacterComponent::GetModifiedMagicDefense()

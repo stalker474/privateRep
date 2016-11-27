@@ -23,6 +23,23 @@ enum class EActiveItemSlot : uint8
 	SLOT_1 	UMETA(DisplayName = "Slot1"),
 	SLOT_2 	UMETA(DisplayName = "Slot2"),
 };
+
+USTRUCT()
+struct FDefaultIconStruct
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = GUI)
+	class UTexture2D* Icon;
+
+	//Constructor
+	FDefaultIconStruct()
+	{
+		//Always initialize your USTRUCT variables!
+		//   exception is if you know the variable type has its own default constructor
+		Icon = nullptr;
+	}
+};
 /**
  * 
  */
@@ -39,10 +56,19 @@ public:
 	FString Name;
 
 	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadOnly, Category = GUI)
-	class UTexture2D* Icon;
+	FString Description;
+
+	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadOnly, Category = GUI)
+	struct FDefaultIconStruct Icon;
 
 	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadOnly, Category = Stats)
 	int Cost;
+
+	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadOnly, Category = Stats)
+	int SellPrice;
+
+	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadOnly, Category = Stats)
+	bool Consumable;
 
 	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadOnly, Category = Stats)
 	TArray<TSubclassOf<UTickEffect>> Effects;

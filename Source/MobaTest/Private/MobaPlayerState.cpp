@@ -9,7 +9,7 @@ AMobaPlayerState::AMobaPlayerState(const FObjectInitializer& ObjectInitializer)
 {
 	Level = 1;
 	Experience = 0;
-	Money = 0;
+	Money = 1000; //set to 0 later
 
 	MyTeamNum = EStrategyTeam::Player;
 
@@ -20,6 +20,16 @@ AMobaPlayerState::AMobaPlayerState(const FObjectInitializer& ObjectInitializer)
 	if (ItemBPClass.Class != NULL)
 	{
 		AvailableItems.Add(ItemBPClass.Class);
+	}
+	static ConstructorHelpers::FClassFinder<UMobaItem> ItemBPClass2(TEXT("/Game/Blueprints/Items/ManaPotion"));
+	if (ItemBPClass2.Class != NULL)
+	{
+		AvailableItems.Add(ItemBPClass2.Class);
+	}
+	static ConstructorHelpers::FClassFinder<UMobaItem> ItemBPClass3(TEXT("/Game/Blueprints/Items/HealthPotion"));
+	if (ItemBPClass3.Class != NULL)
+	{
+		AvailableItems.Add(ItemBPClass3.Class);
 	}
 
 	ItemSlot1 = nullptr;
@@ -121,6 +131,44 @@ UMobaItem* AMobaPlayerState::GetActiveItem(EActiveItemSlot Slot) const
 	return nullptr;
 }
 
+void AMobaPlayerState::EmptySlot(EItemSlot Slot)
+{
+	switch (Slot)
+	{
+	case EItemSlot::SLOT_1:
+		ItemSlot1 = nullptr;
+		break;
+	case EItemSlot::SLOT_2:
+		ItemSlot2 = nullptr;
+		break;
+	case EItemSlot::SLOT_3:
+		ItemSlot3 = nullptr;
+		break;
+	case EItemSlot::SLOT_4:
+		ItemSlot4 = nullptr;
+		break;
+	case EItemSlot::SLOT_5:
+		ItemSlot5 = nullptr;
+		break;
+	case EItemSlot::SLOT_6:
+		ItemSlot6 = nullptr;
+		break;
+	}
+}
+
+void AMobaPlayerState::EmptyActiveSlot(EActiveItemSlot Slot)
+{
+	switch (Slot)
+	{
+	case EItemSlot::SLOT_1:
+		ActiveItemSlot1 = nullptr;
+		break;
+	case EItemSlot::SLOT_2:
+		ActiveItemSlot2 = nullptr;
+		break;
+	}
+}
+
 UMobaItem ** AMobaPlayerState::GetNextEmptySlot()
 {
 	if (ItemSlot1 == nullptr)
@@ -151,13 +199,18 @@ UMobaItem ** AMobaPlayerState::GetNextActiveEmptySlot()
 
 void AMobaPlayerState::BuyItem_Implementation(TSubclassOf<class UMobaItem> ItemClass)
 {
-	UMobaItem ** freeSlot = GetNextEmptySlot();
+	UMobaItem ** freeSlot;
+
+	if (!ItemClass.GetDefaultObject()->Consumable)
+		freeSlot = GetNextEmptySlot();
+	else
+		freeSlot = GetNextActiveEmptySlot();
+	 
 	if (freeSlot != nullptr)
 	{
-		*freeSlot = NewObject<UMobaItem>(this, ItemClass);
+		(*freeSlot) = NewObject<UMobaItem>(this, ItemClass);
 		if ((*freeSlot)->Cost <= Money)
 		{
-			Money -= (*freeSlot)->Cost;
 			(*freeSlot)->RegisterComponent();
 
 			if ((*freeSlot)->Cost <= Money)
@@ -169,7 +222,54 @@ void AMobaPlayerState::BuyItem_Implementation(TSubclassOf<class UMobaItem> ItemC
 	}
 }
 
+void AMobaPlayerState::SellItem_Implementation(EItemSlot Slot)
+{
+	UMobaItem * item = GetItem(Slot);
+	if (item != nullptr)
+	{
+		Money += item->SellPrice;
+		item->UnregisterComponent();
+		EmptySlot(Slot);
+	}
+}
+
+void AMobaPlayerState::SellActiveItem_Implementation(EActiveItemSlot Slot)
+{
+	UMobaItem * item = GetActiveItem(Slot);
+	if (item != nullptr)
+	{
+		Money += item->SellPrice;
+		item->UnregisterComponent();
+		EmptyActiveSlot(Slot);
+	}
+}
+
+void AMobaPlayerState::ActivateItem_Implementation(EActiveItemSlot Slot)
+{
+	UMobaItem * item = GetActiveItem(Slot);
+	if (item != nullptr)
+	{
+		item->UnregisterComponent();
+		EmptyActiveSlot(Slot);
+	}
+}
+
 bool AMobaPlayerState::BuyItem_Validate(TSubclassOf<class UMobaItem> ItemClass)
 {
 	return ItemClass != nullptr && GetNextEmptySlot() != nullptr;
+}
+
+bool AMobaPlayerState::SellItem_Validate(EItemSlot Slot)
+{
+	return GetItem(Slot) != nullptr;
+}
+
+bool AMobaPlayerState::SellActiveItem_Validate(EActiveItemSlot Slot)
+{
+	return GetActiveItem(Slot) != nullptr;
+}
+
+bool AMobaPlayerState::ActivateItem_Validate(EActiveItemSlot Slot)
+{
+	return GetActiveItem(Slot) != nullptr;
 }

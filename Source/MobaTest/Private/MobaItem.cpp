@@ -7,17 +7,20 @@ UMobaItem::UMobaItem(const FObjectInitializer& ObjectInitializer) : Super(Object
 {
 	//bReplicates = true;
 	Cost = 0;
-	Icon = nullptr;
+	Consumable = false;
 	ParentItem = nullptr;
-	this->bReplicates = true;
+	bReplicates = true;
 }
 
 void UMobaItem::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(UMobaItem, Name);
+	DOREPLIFETIME(UMobaItem, Description);
 	DOREPLIFETIME(UMobaItem, Icon);
 	DOREPLIFETIME(UMobaItem, Cost);
+	DOREPLIFETIME(UMobaItem, SellPrice);
+	DOREPLIFETIME(UMobaItem, Consumable);
 	DOREPLIFETIME(UMobaItem, Effects);
 	DOREPLIFETIME(UMobaItem, ParentItem);
 }
@@ -32,5 +35,4 @@ void UMobaItem::Apply(TArray<UTickEffect*>& TickEffects)
 			TickEffects.Add(newEffect);
 		}
 	}
-	
 }

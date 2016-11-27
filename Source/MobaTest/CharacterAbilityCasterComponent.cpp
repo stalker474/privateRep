@@ -352,7 +352,7 @@ float UCharacterAbilityCasterComponent::GetModifiedMana()
 	const AMobaTestCharacter * character = Cast<AMobaTestCharacter>(GetOwner());
 	if(character)
 		Level = character->GetLevel();
-	return Level == 1?BaseMana: BaseMana * (ManaLevelBonus * Level);
+	return Level == 1?BaseMana: BaseMana + (BaseMana * ManaLevelBonus * Level);
 }
 
 float UCharacterAbilityCasterComponent::GetModifiedManaRegen()
@@ -361,6 +361,6 @@ float UCharacterAbilityCasterComponent::GetModifiedManaRegen()
 	const AMobaTestCharacter * character = Cast<AMobaTestCharacter>(GetOwner());
 	if (character)
 		Level = character->GetLevel();
-	return Level == 1 ? BaseManaRegen : BaseManaRegen * (ManaRegenLevelBonus * Level);
+	return Level == 1 ? BaseManaRegen : BaseManaRegen + (BaseManaRegen * ManaRegenLevelBonus * Level);
 }
 
