@@ -103,7 +103,7 @@ void UStrategyAIAction_AttackTarget::OnMoveCompleted()
 	bMovingToTarget = false;
 	if (MyAIController->GetPathFollowingComponent())
 	{
-		MyAIController->GetPathFollowingComponent()->AbortMove(TEXT("close enought"));
+		MyAIController->GetPathFollowingComponent()->AbortMove(*MyAIController->GetOwner(), FPathFollowingResultFlags::AlreadyAtGoal);
 	}
 }
 
@@ -118,7 +118,7 @@ void UStrategyAIAction_AttackTarget::NotifyBump(FHitResult const& Hit)
 		bMovingToTarget = false;
 		if (MyAIController->GetPathFollowingComponent())
 		{
-			MyAIController->GetPathFollowingComponent()->AbortMove(TEXT("Bump"));
+			MyAIController->GetPathFollowingComponent()->AbortMove(*MyAIController->GetOwner(), FPathFollowingResultFlags::Blocked);
 		}
 	}
 }
@@ -154,7 +154,7 @@ void UStrategyAIAction_AttackTarget::Abort()
 
 	if (bMovingToTarget && MyAIController->GetPathFollowingComponent())
 	{
-		MyAIController->GetPathFollowingComponent()->AbortMove(TEXT("abort attack"));
+		MyAIController->GetPathFollowingComponent()->AbortMove(*MyAIController->GetOwner(), FPathFollowingResultFlags::UserAbort);
 	}
 	bMovingToTarget = false;
 	MyAIController->ClearFocus(EAIFocusPriority::Gameplay);

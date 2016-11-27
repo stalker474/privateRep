@@ -25,9 +25,10 @@ void AStrategySpectatorPawn::OnMouseScrollDown()
 }
 
 
-void AStrategySpectatorPawn::SetupPlayerInputComponent(UInputComponent* InputComponent)
+void AStrategySpectatorPawn::SetupPlayerInputComponent(UInputComponent* _InputComponent)
 {
-	check(InputComponent);
+	check(_InputComponent);
+	InputComponent = _InputComponent;
 	
 	InputComponent->BindAction("ZoomOut", IE_Pressed, this, &AStrategySpectatorPawn::OnMouseScrollUp);
 	InputComponent->BindAction("ZoomIn", IE_Pressed, this, &AStrategySpectatorPawn::OnMouseScrollDown);

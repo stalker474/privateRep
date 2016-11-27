@@ -9,9 +9,6 @@
 // Sets default values for this component's properties
 UMobaCombatCharacterComponent::UMobaCombatCharacterComponent(const FObjectInitializer& ObjectInitializer)
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
-	bWantsBeginPlay = true;
 	bWantsInitializeComponent = true;
 	PrimaryComponentTick.bCanEverTick = true;
 	bReplicates = true;
@@ -114,12 +111,12 @@ float UMobaCombatCharacterComponent::ApplyDamage(float DamageAmount, struct FDam
 		AMobaAreaEffect* effect = Cast<AMobaAreaEffect>(DamageCauser);
 		if (effect != nullptr) //if it's an area effect
 		{
-			for (TSubclassOf<UTickEffect>& effect : effect->WeaponConfig.Effects)
+			for (TSubclassOf<UTickEffect>& eff : effect->WeaponConfig.Effects)
 			{
 				AMobaTestCharacter * character = Cast<AMobaTestCharacter>(GetOwner());
 				
 				if (character)
-					character->AddTickEffect(effect);
+					character->AddTickEffect(eff);
 			}
 
 

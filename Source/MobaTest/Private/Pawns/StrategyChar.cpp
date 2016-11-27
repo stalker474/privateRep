@@ -135,8 +135,7 @@ void AStrategyChar::Die(float KillingDamage, FDamageEvent const& DamageEvent, AC
 {
 	if ( bIsDying										// already dying
 		|| IsPendingKill()								// already destroyed
-		|| GetWorld()->GetAuthGameMode() == nullptr
-		|| GetWorld()->GetAuthGameMode()->GetMatchState() == MatchState::LeavingMap)	// level transition occurring
+		|| GetWorld()->GetAuthGameMode() == nullptr)	// level transition occurring
 	{
 		return;
 	}

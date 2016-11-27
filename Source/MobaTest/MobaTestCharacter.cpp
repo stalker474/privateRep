@@ -57,11 +57,11 @@ void AMobaTestCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > 
 //////////////////////////////////////////////////////////////////////////
 // Input
 
-void AMobaTestCharacter::SetupPlayerInputComponent(class UInputComponent* InputComponent)
+void AMobaTestCharacter::SetupPlayerInputComponent(class UInputComponent* _InputComponent)
 {
 	// Set up gameplay key bindings
 	check(InputComponent);
-
+	InputComponent = _InputComponent;
 	AbilitySlot->SetupPlayerInputComponent(InputComponent);
 	InputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	InputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);

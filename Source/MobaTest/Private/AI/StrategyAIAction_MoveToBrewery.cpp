@@ -32,7 +32,7 @@ void UStrategyAIAction_MoveToBrewery::Abort()
 	Destination = FVector::ZeroVector;
 	if (MyAIController->GetPathFollowingComponent())
 	{
-		MyAIController->GetPathFollowingComponent()->AbortMove(TEXT("abort brewery"));
+		MyAIController->GetPathFollowingComponent()->AbortMove(*MyAIController->GetOwner(), FPathFollowingResultFlags::UserAbort);
 	}
 	MyAIController->UnregisterMovementEventDelegate();
 }

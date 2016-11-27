@@ -41,12 +41,11 @@ EGameplayState::Type AStrategyGameMode::GetGameplayState() const
 void AStrategyGameMode::InitGameState()
 {
 	Super::InitGameState();
-
-	AStrategyGameState* const GameState = GetGameState<AStrategyGameState>();
-	if (GameState)
+	AStrategyGameState* const gameState = GetGameState<AStrategyGameState>();
+	if (gameState)
 	{
 		// start the game!
-		GameState->StartGameplayStateMachine();
+		gameState->StartGameplayStateMachine();
 	}
 }
 

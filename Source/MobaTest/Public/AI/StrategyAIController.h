@@ -73,7 +73,7 @@ public:
 	// End Controller Interface
 
 	// Begin AIController Interface
-	virtual void OnMoveCompleted(FAIRequestID RequestID, EPathFollowingResult::Type Result) override;
+	virtual void OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result) override;
 	// End AIController Interface
 
 	// Begin StrategyTeamInterface Interface

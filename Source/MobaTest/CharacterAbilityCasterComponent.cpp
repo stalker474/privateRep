@@ -14,7 +14,6 @@ UCharacterAbilityCasterComponent::UCharacterAbilityCasterComponent(const FObject
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
-	bWantsBeginPlay = true;
 	bWantsInitializeComponent = true;
 	PrimaryComponentTick.bCanEverTick = true;
 	bReplicates = true;
@@ -79,11 +78,11 @@ void UCharacterAbilityCasterComponent::GetLifetimeReplicatedProps(TArray< FLifet
 	DOREPLIFETIME(UCharacterAbilityCasterComponent, Ability4);
 }
 
-void UCharacterAbilityCasterComponent::SetupPlayerInputComponent(class UInputComponent* InputComponent)
+void UCharacterAbilityCasterComponent::SetupPlayerInputComponent(class UInputComponent* _InputComponent)
 {
 	if (GetOwnerRole() != ROLE_Authority)
 	{
-		this->InputComponent = InputComponent;
+		InputComponent = _InputComponent;
 		InputComponent->BindAction("Action1", IE_Pressed, this, &UCharacterAbilityCasterComponent::LaunchDefaultAbility);
 		InputComponent->BindAction("ActionAbility1", IE_Pressed, this, &UCharacterAbilityCasterComponent::LaunchAbility1);
 		InputComponent->BindAction("ActionAbility2", IE_Pressed, this, &UCharacterAbilityCasterComponent::LaunchAbility2);
