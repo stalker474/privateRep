@@ -91,9 +91,12 @@ void UMobaAreaDamageAbility::UpdateState()
 
 				AMobaAreaEffect * test = NewObject<AMobaAreaEffect>(this, AreaEffectClass);
 				FVector ss = test->CollisionComp->RelativeScale3D;
-				mTransform.SetScale3D(ss);
+				FVector sf = test->CollisionComp->RelativeLocation;
 				TargetActor = GetWorld()->SpawnActor<AActor>(TargetActorClass, mTransform);
 				TargetActor->SetActorScale3D(ss);
+				TargetActor->SetActorRelativeLocation(sf);
+				TargetActor->SetOwner(GetOwner());
+				TargetActor->SetReplicates(false);
 			}
 			else
 			{
