@@ -152,16 +152,6 @@ void AStrategyChar::Die(float KillingDamage, FDamageEvent const& DamageEvent, AC
 	// forcibly end any timers that may be in flight
 	GetWorldTimerManager().ClearAllTimersForObject(this);
 
-	// notify the game mode if an Enemy dies
-	if (GetTeamNum() == EStrategyTeam::Enemy)
-	{
-		AStrategyGameState* const GameState = GetWorld()->GetGameState<AStrategyGameState>();
-		if (GameState)
-		{
-
-		}
-	}
-
 	// disable any AI
 	AStrategyAIController* const AIController = Cast<AStrategyAIController>(Controller);
 	if (AIController)

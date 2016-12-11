@@ -9,7 +9,7 @@
 AStrategyBuilding::AStrategyBuilding(const FObjectInitializer& ObjectInitializer) 
 	: Super(ObjectInitializer)
 	, BuildingName(TEXT("Unknown"))
-	, SpawnTeamNum(EStrategyTeam::Unknown)
+	, SpawnTeamNum(EStrategyTeam::Spectator)
 	,Active(true)
 {
 	PrimaryActorTick.bCanEverTick = true;

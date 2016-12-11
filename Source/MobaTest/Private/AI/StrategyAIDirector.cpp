@@ -15,7 +15,7 @@ UStrategyAIDirector::UStrategyAIDirector(const FObjectInitializer& ObjectInitial
 	, CustomScale(1.0)
 	, AnimationRate(1)
 	, NextSpawnTime(0)
-	, MyTeamNum(EStrategyTeam::Unknown)
+	, MyTeamNum(EStrategyTeam::Spectator)
 	,LeftToSpawn(8)
 	,TimeBetweenSpawns(60.0f)
 	,TimeSinceLastSpawn(0.0f)
@@ -133,7 +133,7 @@ void UStrategyAIDirector::SpawnMinions()
 
 	if (EnemyBrewery == nullptr)
 	{
-		const EStrategyTeam::Type EnemyTeamNum = (MyTeamNum == EStrategyTeam::Player ? EStrategyTeam::Enemy : EStrategyTeam::Player);
+		const EStrategyTeam::Type EnemyTeamNum = (MyTeamNum == EStrategyTeam::Blue ? EStrategyTeam::Red : EStrategyTeam::Blue);
 		FPlayerData* const EnemyTeamData = GetWorld()->GetGameState<AStrategyGameState>()->GetPlayerData(EnemyTeamNum);
 		if (EnemyTeamData != nullptr && EnemyTeamData->GetLaneBuilding(LanePosition) != nullptr)
 		{
@@ -204,7 +204,7 @@ void UStrategyAIDirector::SpawnMinions()
 
 				LeftToSpawn -= 1;
 				LeftToSpawn = FMath::Max(LeftToSpawn, 0);
-				if (Owner != nullptr && WaveSize <= 0 && MyTeamNum==EStrategyTeam::Enemy)
+				if (Owner != nullptr && WaveSize <= 0)
 				{
 					Owner->OnWaveSpawned.Broadcast();
 				}

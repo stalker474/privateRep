@@ -80,7 +80,7 @@ void AStrategyAIController::UnPossess()
 uint8 AStrategyAIController::GetTeamNum() const
 {
 	AStrategyChar* const MyChar = Cast<AStrategyChar>(GetPawn());
-	return (MyChar != NULL) ? MyChar->GetTeamNum() : EStrategyTeam::Unknown;
+	return (MyChar != NULL) ? MyChar->GetTeamNum() : EStrategyTeam::Spectator;
 }
 
 void AStrategyAIController::OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result)

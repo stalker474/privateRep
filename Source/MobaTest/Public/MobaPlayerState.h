@@ -3,9 +3,20 @@
 #pragma once
 #include "GameFramework/PlayerState.h"
 #include "MobaItem.h"
+#include "StrategyTeamInterface.h"
 
 #include "MobaPlayerState.generated.h"
 
+UENUM(BlueprintType)
+namespace EMobaState
+{
+	enum Type
+	{
+		ChosingCharacter,
+		Waiting,
+		Playing
+	};
+}
 /**
  * 
  */
@@ -16,6 +27,22 @@ class MOBATEST_API AMobaPlayerState : public APlayerState
 
 
 public:
+	void CopyProperties(class APlayerState* PlayerState) override;
+	/**
+	* Register a player with the online subsystem
+	* @param bWasFromInvite was this player invited directly
+	*/
+	virtual void RegisterPlayerWithSession(bool bWasFromInvite) override;
+
+	UFUNCTION(BlueprintCallable, Server, Reliable, WithValidation, Category = "Character choice")
+	void ChoseCharacter(TSubclassOf<class AMobaTestCharacter> CharacterClass);
+
+	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable, Category = "State")
+	void Ready();
+
+	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable, Category = "Chat")
+	void SendTextMessage(const FString& msg);
+
 	UFUNCTION(Server, Reliable, BlueprintCallable, WithValidation, Category = "Stats")
 	void LevelUp();
 
@@ -58,17 +85,25 @@ public:
 	UFUNCTION()
 	void EmptyActiveSlot(EActiveItemSlot Slot);
 
-
 	UPROPERTY(Replicated, BlueprintReadOnly, Category = "Item shop")
 	TArray<TSubclassOf<class UMobaItem>> AvailableItems;
+
+	UPROPERTY(Replicated, BlueprintReadOnly)
+	uint8 MyTeamNum;
+
+	UPROPERTY(Replicated, BlueprintReadOnly, Category = "CurrentState")
+	TEnumAsByte<EMobaState::Type> State;
+
+	UPROPERTY()
+	AMobaTestCharacter* SelectedChar;
+
+	UPROPERTY(Replicated, BlueprintReadOnly, Category="Selected character")
+	TSubclassOf<AMobaTestCharacter> SelectedCharClass;
 protected:
 
 	UMobaItem** GetNextEmptySlot();
 
 	UMobaItem** GetNextActiveEmptySlot();
-	
-	UPROPERTY(Replicated)
-	uint8 MyTeamNum;
 
 	UPROPERTY(Replicated)
 	class UMobaItem* ItemSlot1;
@@ -102,4 +137,7 @@ protected:
 
 	UPROPERTY(Replicated)
 	int Money;
+
+	UPROPERTY()
+	APlayerStart * MyStart;
 };

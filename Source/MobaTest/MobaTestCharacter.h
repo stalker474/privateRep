@@ -9,7 +9,6 @@
 #include "MobaTestCharacter.generated.h"
 
 
-
 UCLASS(config=Game)
 class AMobaTestCharacter : public ACharacter, public IStrategyTeamInterface
 {
@@ -44,7 +43,10 @@ public:
 	class UMobaCombatCharacterComponent * CombatCharacterComponent;
 
 	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadOnly, Category = GUI)
-	class UTexture2D* Icon;
+	struct FDefaultIconStruct Icon;
+
+	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadOnly, Category = GUI)
+	FString Name;
 
 	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadOnly)
 	float BaseSpeed;

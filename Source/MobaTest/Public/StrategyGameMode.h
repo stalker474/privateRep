@@ -3,7 +3,10 @@
 #pragma once
 
 #include "StrategyTypes.h"
+#include "MobaTestCharacter.h"
 #include "StrategyGameMode.generated.h"
+
+DECLARE_LOG_CATEGORY_EXTERN(MobaGameModeLog, Log, All);
 
 class AController;
 class AStrategyBuilding;
@@ -32,6 +35,10 @@ class AStrategyGameMode : public AGameMode
 	  */
 	virtual float ModifyDamage(float Damage, AActor* DamagedActor, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) const;
 
+	UFUNCTION()
+	void Ready(AController* Player);
+
+	UClass* GetDefaultPawnClassForController_Implementation(AController* InController) override;
 	
 
 	// End GameMode interface
@@ -62,13 +69,30 @@ class AStrategyGameMode : public AGameMode
 	/** select best spawn point for player */
 	virtual class AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 
+	virtual void PostLogin(APlayerController* NewPlayer) override;
+
 	/** check if player can use spawnpoint */
 	virtual bool IsSpawnpointAllowed(APlayerStart* SpawnPoint, AController* Player) const;
 
 	/** check if player should use spawnpoint */
 	virtual bool IsSpawnpointPreferred(APlayerStart* SpawnPoint, AController* Player) const;
 
+	UPROPERTY(EditAnywhere)
+	ULevel* LobbyMap;
+
+	UPROPERTY(EditAnywhere)
+	ULevel* Map;
+
 protected:
+	int BlueCount;
+	int RedCount;
+
+	int BlueReady;
+	int RedReady;
+
+	UClass * DefaultCharacterClass;
+	UClass * InGameHUDClass;
+
 	/* Helper to return the current gameplay state. */
 	EGameplayState::Type GetGameplayState() const;
 

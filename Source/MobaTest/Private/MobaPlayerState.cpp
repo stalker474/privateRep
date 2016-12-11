@@ -2,16 +2,22 @@
 
 #include "MobaTest.h"
 #include "MobaItem.h"
+#include "StrategySpawnPoint.h"
 #include "MobaPlayerState.h"
 
 AMobaPlayerState::AMobaPlayerState(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
+	State = EMobaState::ChosingCharacter;
+
+	SelectedChar = nullptr;
+	MyStart = nullptr;
+
 	Level = 1;
 	Experience = 0;
 	Money = 1000; //set to 0 later
 
-	MyTeamNum = EStrategyTeam::Player;
+	MyTeamNum = EStrategyTeam::Blue;
 
 	TArray<UObject*> ItemAssets;
 	EngineUtils::FindOrLoadAssetsByPath(TEXT("/Game/Blueprints/Items/"), ItemAssets, EngineUtils::ATL_Regular);
@@ -46,6 +52,8 @@ AMobaPlayerState::AMobaPlayerState(const FObjectInitializer& ObjectInitializer)
 void AMobaPlayerState::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(AMobaPlayerState, SelectedCharClass);
+	DOREPLIFETIME(AMobaPlayerState, State);
 	DOREPLIFETIME(AMobaPlayerState, Level);
 	DOREPLIFETIME(AMobaPlayerState, Experience);
 	DOREPLIFETIME(AMobaPlayerState, Money);
@@ -61,12 +69,104 @@ void AMobaPlayerState::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & 
 	DOREPLIFETIME(AMobaPlayerState, AvailableItems);
 }
 
+void AMobaPlayerState::CopyProperties(class APlayerState* PlayerState)
+{
+
+	APlayerState::CopyProperties(PlayerState);
+
+	AMobaPlayerState* MyPlayerState = Cast<AMobaPlayerState>(PlayerState);
+
+	if (MyPlayerState)
+	{
+		MyPlayerState->SelectedCharClass = SelectedCharClass;
+		MyPlayerState->MyTeamNum = MyTeamNum;
+		MyPlayerState->State = State;
+	}
+
+}
+
+void AMobaPlayerState::RegisterPlayerWithSession(bool bWasFromInvite)
+{
+	Super::RegisterPlayerWithSession(bWasFromInvite);
+}
+
+void AMobaPlayerState::ChoseCharacter_Implementation(TSubclassOf<class AMobaTestCharacter> CharacterClass)
+{
+	UWorld* const world = GetWorld(); // get a reference to the world
+	if (world) {
+		APlayerStart* Start = MyStart;
+		if (!MyStart)
+		{
+			for (TActorIterator<APlayerStart> It(world); It; ++It)
+			{
+				Start = *It;
+				AStrategySpawnPoint * thisStartPoint = Cast<AStrategySpawnPoint>(Start);
+				if (thisStartPoint && thisStartPoint->GetTeamNum() == GetTeam() && thisStartPoint->IsSpawnable && !thisStartPoint->Player)
+				{
+					thisStartPoint->Player = GetNetOwningPlayer()->PlayerController;
+					thisStartPoint->MULTICAST_PlayerChanged(PlayerName);
+					MyStart = thisStartPoint;
+					break;
+				}
+			}
+		}
+
+		if (Start)
+		{
+			if (SelectedChar && SelectedChar->GetClass() == CharacterClass)
+				return;
+			if (SelectedChar)
+				SelectedChar->Destroy();
+
+			SelectedChar = world->SpawnActor<AMobaTestCharacter>(CharacterClass, Start->GetActorLocation(), Start->GetActorRotation());
+			SelectedCharClass = CharacterClass;
+
+		}
+	}
+}
+
+void AMobaPlayerState::Ready_Implementation()
+{
+	AStrategyGameMode * gameMode = Cast<AStrategyGameMode>(GetWorld()->GetAuthGameMode());
+	gameMode->Ready(GetNetOwningPlayer()->PlayerController);
+}
+
+void AMobaPlayerState::SendTextMessage_Implementation(const FString& msg)
+{
+	AStrategyGameState * gs = Cast<AStrategyGameState>(GetWorld()->GetGameState());
+	if (gs)
+	{
+		gs->ChatText += GetNetOwningPlayer()->GetName() + ": " + msg + "\n";
+	}
+}
+
+bool AMobaPlayerState::ChoseCharacter_Validate(TSubclassOf<class AMobaTestCharacter> CharacterClass)
+{
+	AStrategyGameState * gs = Cast<AStrategyGameState>(GetWorld()->GetGameState());
+	if (gs)
+	{
+		return gs->AvailableCharacters.Contains(CharacterClass);
+	}
+	else
+		return false;
+}
+
+bool AMobaPlayerState::Ready_Validate()
+{
+	return SelectedChar != nullptr;
+}
+
 void AMobaPlayerState::LevelUp_Implementation()
 {
 	if (Level < 20)
 	{
 		Level++;
 	}
+}
+
+bool AMobaPlayerState::SendTextMessage_Validate(const FString& msg)
+{
+	return true;
 }
 
 bool AMobaPlayerState::LevelUp_Validate()

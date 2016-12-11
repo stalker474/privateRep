@@ -12,15 +12,29 @@
 UCLASS()
 class MOBATEST_API AStrategySpawnPoint : public APlayerStart, public IStrategyTeamInterface
 {
-	GENERATED_BODY()
+	GENERATED_UCLASS_BODY()
+public:
 	
 		/** team */
-	UPROPERTY(EditInstanceOnly, Category = Building)
+	UPROPERTY(EditInstanceOnly, Category = Team)
 	TEnumAsByte<EStrategyTeam::Type> SpawnTeamNum;
 	
 	// Begin StrategyTeamInterface interface
 
 	/** [IStrategyTeamInterface] get team number */
-	virtual uint8 GetTeamNum() const override;
+	UFUNCTION(BlueprintCallable, Category="Team")
+	uint8 GetTeamNum() const override;
 	// End StrategyTeamInterface interface
+
+	UPROPERTY()
+	APlayerController* Player;
+
+	UFUNCTION(NetMulticast,Reliable)
+	void MULTICAST_PlayerChanged(const FString& Name);
+
+	UFUNCTION(BlueprintNativeEvent)
+	void PlayerChanged(const FString& Name);
+
+	UPROPERTY(EditInstanceOnly, Category = DeveloperOnly)
+	bool IsSpawnable;
 };

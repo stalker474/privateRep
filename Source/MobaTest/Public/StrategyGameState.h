@@ -3,7 +3,6 @@
 #pragma once
 
 #include "StrategyTypes.h"
-#include "StrategyMiniMapCapture.h"
 #include "StrategyGameState.generated.h"
 
 class AStrategyChar;
@@ -15,26 +14,15 @@ class AStrategyGameState : public AGameState
 	GENERATED_UCLASS_BODY()
 
 public:
-	/** Mini map camera component. */
-	TWeakObjectPtr<AStrategyMiniMapCapture> MiniMapCamera;
-
 	/** Game state. */
 	EGameplayState::Type GameplayState;
-
-	/** World bounds for mini map & camera movement. */
-	FBox WorldBounds;
 
 	/** Warm up time before game starts */
 	UPROPERTY(config)
 	int32 WarmupTime;
 
-	/** 
-	 * Set the pause state of the game.
-	 * 
-	 * @param	bIsPaused	The required pause state
-	 */
-	UFUNCTION(BlueprintCallable, Category=Game)
-	void SetGamePaused(bool bIsPaused);
+	UFUNCTION()
+	void NewPlayerJoined(AController* Player);
 
 	void FinishGame();
 
@@ -77,6 +65,18 @@ public:
 
 	/** Get time when game finished */
 	float GetGameFinishedTime() const;
+
+	UPROPERTY(EditDefaultsOnly, Replicated, BlueprintReadOnly, Category = "Characters")
+	TArray<TSubclassOf<class AMobaTestCharacter>> AvailableCharacters;
+
+	UPROPERTY(Replicated, BlueprintReadOnly, Category = "Blue Players")
+	TArray<APlayerState*> BluePlayers;
+
+	UPROPERTY(Replicated, BlueprintReadOnly, Category = "Red Players")
+	TArray<APlayerState*> RedPlayers;
+
+	UPROPERTY(Replicated, BlueprintReadOnly, Category = "Chat")
+	FString ChatText;
 
 protected:
 	

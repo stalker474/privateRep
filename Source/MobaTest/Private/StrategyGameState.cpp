@@ -2,6 +2,8 @@
 
 #include "MobaTest.h"
 #include "StrategyBuilding_Brewery.h"
+#include "MobaTestCharacter.h"
+#include "MobaPlayerState.h"
 #include "StrategyTypes.h"
 
 AStrategyGameState::AStrategyGameState(const FObjectInitializer& ObjectInitializer)
@@ -9,8 +11,18 @@ AStrategyGameState::AStrategyGameState(const FObjectInitializer& ObjectInitializ
 {
 	// team data for: unknown, player, enemy
 	PlayersData.AddZeroed(EStrategyTeam::MAX);
-	MiniMapCamera = nullptr;
 	GameFinishedTime = 0;
+	bReplicates = true;
+	ChatText = "";
+}
+
+void AStrategyGameState::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(AStrategyGameState, AvailableCharacters);
+	DOREPLIFETIME(AStrategyGameState, BluePlayers);
+	DOREPLIFETIME(AStrategyGameState, RedPlayers);
+	DOREPLIFETIME(AStrategyGameState, ChatText);
 }
 
 void AStrategyGameState::OnActorDamaged(AActor* InActor, float Damage, AController* EventInstigator)
@@ -27,7 +39,7 @@ void AStrategyGameState::OnActorDamaged(AActor* InActor, float Damage, AControll
 
 FPlayerData* AStrategyGameState::GetPlayerData(uint8 TeamNum) const
 {
-	if (TeamNum != EStrategyTeam::Unknown)
+	if (TeamNum != EStrategyTeam::Spectator)
 	{
 		return &PlayersData[TeamNum];
 	}
@@ -74,10 +86,25 @@ float AStrategyGameState::GetRemainingWaitTime() const
 
 void AStrategyGameState::OnGameStart()
 {
-	SetGameplayState(EGameplayState::Playing);
+	if(GetWorld()->GetName() == "Lobby")
+		SetGameplayState(EGameplayState::ChosingCharacter);
+	else
+		SetGameplayState(EGameplayState::Joining);
 	GameFinishedTime = 0.0f;
 }
 
+
+void AStrategyGameState::NewPlayerJoined(AController * Player)
+{
+	AMobaPlayerState * ps = Cast<AMobaPlayerState>(Player->PlayerState);
+	if (ps)
+	{
+		if (ps->GetTeam() == EStrategyTeam::Blue)
+			BluePlayers.Add(Player->PlayerState);
+		else
+			RedPlayers.Add(Player->PlayerState);
+	}
+}
 
 void AStrategyGameState::FinishGame()
 {
@@ -98,18 +125,6 @@ void AStrategyGameState::StartGameplayStateMachine()
 	{
 		OnGameStart();
 	}
-}
-
-void AStrategyGameState::SetTimersPause(bool bIsPaused)
-{
-	if (GameplayState == EGameplayState::Waiting )
-	{
-		bIsPaused ? GetWorldTimerManager().PauseTimer(TimerHandle_OnGameStart) : GetWorldTimerManager().UnPauseTimer(TimerHandle_OnGameStart);
-	}
-}
-void AStrategyGameState::SetGamePaused(bool bIsPaused)
-{
-
 }
 
 float AStrategyGameState::GetGameFinishedTime() const

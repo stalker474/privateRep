@@ -53,7 +53,7 @@ void ATowerAIController::UnPossess()
 uint8 ATowerAIController::GetTeamNum() const
 {
 	AMobaTower* const MyChar = Cast<AMobaTower>(GetPawn());
-	return (MyChar != NULL) ? MyChar->GetTeamNum() : EStrategyTeam::Unknown;
+	return (MyChar != NULL) ? MyChar->GetTeamNum() : EStrategyTeam::Spectator;
 }
 
 bool ATowerAIController::IsActionAllowed(TSubclassOf<UTowerAIAction> inClass) const

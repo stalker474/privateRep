@@ -12,6 +12,7 @@ AStrategySpectatorPawn::AStrategySpectatorPawn(const FObjectInitializer& ObjectI
 	GetCollisionComponent()->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
 	bAddDefaultMovementBindings = false;
 	StrategyCameraComponent = CreateDefaultSubobject<UStrategyCameraComponent>(TEXT("StrategyCameraComponent"));
+	StrategyCameraComponent->FieldOfView = 90.0f;
 }
 
 void AStrategySpectatorPawn::OnMouseScrollUp()

@@ -50,6 +50,7 @@ void AMobaTestCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > 
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(AMobaTestCharacter, Icon);
+	DOREPLIFETIME(AMobaTestCharacter, Name);
 	DOREPLIFETIME(AMobaTestCharacter, BaseSpeed);
 	DOREPLIFETIME(AMobaTestCharacter, TickEffects);
 }

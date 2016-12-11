@@ -11,9 +11,9 @@ namespace EStrategyTeam
 {
 	enum Type
 	{
-		Unknown,
-		Player,
-		Enemy,
+		Spectator,
+		Blue,
+		Red,
 		MAX
 	};
 }
@@ -34,6 +34,8 @@ namespace EGameplayState
 {
 	enum Type
 	{
+		Joining,
+		ChosingCharacter,
 		Waiting,
 		Playing,
 		Finished,
