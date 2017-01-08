@@ -4,7 +4,7 @@
 
 #include "StrategyAIAction.generated.h"
 
-class AStrategyAIController;
+class ABaseAIController;
 
 UCLASS(abstract, BlueprintType)
 class UStrategyAIAction : public UObject
@@ -30,11 +30,11 @@ class UStrategyAIAction : public UObject
 	virtual bool IsSafeToAbort() const;
 
 	/** Set owning AI controller. */
-	void SetController(AStrategyAIController* InOwner);
+	void SetController(ABaseAIController* InOwner);
 
 protected:
 	/** Weak pointer to AI controller, to have faster access (cached information). */
-	TWeakObjectPtr<AStrategyAIController>	MyAIController;
+	TWeakObjectPtr<ABaseAIController>	MyAIController;
 
 	/**	Tells us if we are already executed. */
 	bool bIsExecuted;

@@ -28,4 +28,6 @@ protected:
 
 	/** next time to spawn */
 	float NextSpawnTime;
+
+	bool MonstersAlive;
 };

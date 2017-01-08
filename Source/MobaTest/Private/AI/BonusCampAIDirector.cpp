@@ -9,7 +9,8 @@
 // Sets default values for this component's properties
 UBonusCampAIDirector::UBonusCampAIDirector(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
-	, NextSpawnTime(0)
+	, NextSpawnTime(0.1f)
+	,MonstersAlive(false)
 {
 	PrimaryComponentTick.bCanEverTick = true;
 	PrimaryComponentTick.bStartWithTickEnabled = false;
@@ -29,15 +30,14 @@ void UBonusCampAIDirector::BeginPlay()
 void UBonusCampAIDirector::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	NextSpawnTime -= DeltaTime;
 	if (GetOwnerRole() == ROLE_Authority)
 	{
-		/*TimeSinceLastSpawn += DeltaTime;
-		if (TimeSinceLastSpawn >= TimeBetweenSpawns)
+		if (NextSpawnTime <= 0.0f && !MonstersAlive)
 		{
-			TimeSinceLastSpawn = 0.0f;
-			LeftToSpawn = WaveSize;
+			Spawn();
+			MonstersAlive = true;
 		}
-		SpawnMinions();*/
 	}
 }
 

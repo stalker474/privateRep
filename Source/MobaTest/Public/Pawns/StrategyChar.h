@@ -104,7 +104,7 @@ protected:
 	UAnimMontage* MeleeAnim;
 
 	/** death anim */
-	UPROPERTY(EditDefaultsOnly, Category=Pawn)
+	UPROPERTY(Replicated,EditDefaultsOnly, Category=Pawn)
 	UAnimMontage* DeathAnim;
 	
 	/** Armor attachment slot */

@@ -44,7 +44,14 @@ void UStrategyAIAction_MoveToBrewery::Activate()
 
 	NotMovingFromTime = 0;
 	// find brewery base and cache it's destination
-	FPlayerData* TeamData = MyAIController->GetTeamData();
+	AStrategyAIController * pController = Cast<AStrategyAIController>(MyAIController.Get());
+
+	if (pController == nullptr)
+	{
+		UE_VLOG(MyAIController.Get(), LogMobaAI, Log, TEXT("ERROR, MoveToBrewery can only be used on AStrategyChar!"));
+		return;
+	}
+	FPlayerData* TeamData = pController->GetTeamData();
 	AStrategyChar * myChar = Cast<AStrategyChar>(MyAIController->GetPawn());
 
 	if (TeamData != NULL && (TeamData->GetLaneBuilding(myChar->LanePosition).IsValid()) && TeamData->GetLaneBuilding(myChar->LanePosition)->GetAIDirector() != NULL)
@@ -90,7 +97,15 @@ bool UStrategyAIAction_MoveToBrewery::ShouldActivate() const
 	check(MyAIController.IsValid());
 
 	FVector DesiredDestination = FVector::ZeroVector;
-	FPlayerData* TeamData = MyAIController->GetTeamData();
+
+	AStrategyAIController * pController = Cast<AStrategyAIController>(MyAIController.Get());
+
+	if (pController == nullptr)
+	{
+		UE_VLOG(MyAIController.Get(), LogMobaAI, Log, TEXT("ERROR, MoveToBrewery can only be used on AStrategyChar!"));
+		return false;
+	}
+	FPlayerData* TeamData = pController->GetTeamData();
 	AStrategyChar * myChar = Cast<AStrategyChar>(MyAIController->GetPawn());
 	if (TeamData != NULL && TeamData->GetLaneBuilding(myChar->LanePosition).IsValid() && TeamData->GetLaneBuilding(myChar->LanePosition)->GetAIDirector() != NULL)
 	{
@@ -119,7 +134,7 @@ void UStrategyAIAction_MoveToBrewery::OnPathUpdated(INavigationPathGenerator* Pa
 
 	if (inType != EPathUpdate::Update)
 	{
-		UE_VLOG(MyAIController.Get(), LogStrategyAI, Log, TEXT("WARRNING, OnPathUpdated with error - PathUpdateTyp %d"), int32(inType)); 
+		UE_VLOG(MyAIController.Get(), LogMobaAI, Log, TEXT("WARRNING, OnPathUpdated with error - PathUpdateTyp %d"), int32(inType)); 
 		Abort();
 	}
 }

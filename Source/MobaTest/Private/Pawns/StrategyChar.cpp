@@ -46,6 +46,7 @@ void AStrategyChar::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & Out
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(AStrategyChar, MeleeAnim);
+	DOREPLIFETIME(AStrategyChar, DeathAnim);
 	DOREPLIFETIME(AStrategyChar, MyTeamNum);
 }
 

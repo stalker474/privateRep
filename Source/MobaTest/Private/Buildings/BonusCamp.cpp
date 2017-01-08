@@ -27,13 +27,6 @@ void ABonusCamp::Tick( float DeltaTime )
 
 }
 
-// Called to bind functionality to input
-void ABonusCamp::SetupPlayerInputComponent(class UInputComponent* InputComponent)
-{
-	Super::SetupPlayerInputComponent(InputComponent);
-
-}
-
 void ABonusCamp::OnGameplayStateChange(EGameplayState::Type NewState)
 {
 	if (Role == ROLE_Authority)

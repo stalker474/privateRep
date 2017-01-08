@@ -36,7 +36,7 @@ void UStrategyAIAction::Activate()
 	bIsExecuted = true; 
 }
 
-void UStrategyAIAction::SetController(AStrategyAIController* InOwner)
+void UStrategyAIAction::SetController(ABaseAIController* InOwner)
 { 
 	MyAIController = InOwner; 
 }
