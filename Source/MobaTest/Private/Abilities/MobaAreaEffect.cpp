@@ -40,13 +40,9 @@ void AMobaAreaEffect::OnImpact(AActor* self, AActor* victim)
 	{
 		FDamageEvent customEvent;
 		customEvent.DamageTypeClass = WeaponConfig.DamageType;
-		IStrategyTeamInterface * teamActor = Cast<IStrategyTeamInterface>(victim);
-		IStrategyTeamInterface * myTeam = Cast<IStrategyTeamInterface>(GetOwner());
-
-		if(teamActor == nullptr)
-			UE_LOG(AreaEffectLog, Warning, TEXT("Area effect collision handling a bad actor!"));
-		if(teamActor && (teamActor->GetTeamNum() != myTeam->GetTeamNum()))
-			victim->TakeDamage(WeaponConfig.Damage, customEvent, nullptr, this);
+		
+		if(!AStrategyGameMode::OnFriendlyTeam(GetOwner(), victim))
+			victim->TakeDamage(WeaponConfig.Damage, customEvent, self->GetInstigatorController(), this);
 	}
 }
 

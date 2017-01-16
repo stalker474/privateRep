@@ -11,6 +11,11 @@ ABonusCamp::ABonusCamp(const FObjectInitializer& ObjectInitializer)
 
 	AIDirector = CreateDefaultSubobject<UBonusCampAIDirector>(TEXT("AIDirectorComp"));
 	AIDirector->SetIsReplicated(false);
+	CapsuleTriggerBox = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CapsuleTrigger"));
+	CapsuleTriggerBox->bAutoActivate = true;
+	CapsuleTriggerBox->SetIsReplicated(false);
+	CapsuleTriggerBox->OnComponentBeginOverlap.AddDynamic(this, &ABonusCamp::OnOverlapBegin);
+	CapsuleTriggerBox->OnComponentEndOverlap.AddDynamic(this, &ABonusCamp::OnOverlapEnd);
 }
 
 // Called when the game starts or when spawned
@@ -34,6 +39,37 @@ void ABonusCamp::OnGameplayStateChange(EGameplayState::Type NewState)
 		if (AIDirector != nullptr)
 		{
 			AIDirector->OnGameplayStateChange(NewState);
+		}
+	}
+}
+
+void ABonusCamp::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	// Other Actor is the actor that triggered the event. Check that is not ourself.  
+	if ((OtherActor != nullptr) && (OtherActor != this) && (OtherComp != nullptr))
+	{
+		AMobaTestCharacter * player = Cast<AMobaTestCharacter>(OtherActor);
+		if (player)
+		{
+			if (AIDirector != nullptr && AIDirector->MonsterAIController.IsValid())
+				AIDirector->MonsterAIController->AddAuthorizedTarget(player);
+		}
+	}
+}
+
+void ABonusCamp::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	// Other Actor is the actor that triggered the event. Check that is not ourself.  
+	if ((OtherActor != nullptr) && (OtherActor != this) && (OtherComp != nullptr))
+	{
+		AMobaTestCharacter * player = Cast<AMobaTestCharacter>(OtherActor);
+		if (player)
+		{
+			if (AIDirector != nullptr && AIDirector->MonsterAIController.IsValid())
+			{
+				AIDirector->MonsterAIController->RemoveAuthorizedTarget(player);
+			}
+				
 		}
 	}
 }

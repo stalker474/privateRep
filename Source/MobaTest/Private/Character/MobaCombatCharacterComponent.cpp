@@ -103,7 +103,7 @@ float UMobaCombatCharacterComponent::ApplyDamage(float DamageAmount, struct FDam
 		Health -= GetModifiedDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 		if (Health <= 0)
 		{
-			AStrategyChar * myOwner = Cast<AStrategyChar>(GetOwner());
+			AMobaAICharacter * myOwner = Cast<AMobaAICharacter>(GetOwner());
 			if (myOwner)
 				myOwner->Die(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 		}
@@ -131,7 +131,6 @@ float UMobaCombatCharacterComponent::GetModifiedHealth()
 {
 	int Level = 1;
 	const AMobaTestCharacter * character = Cast<AMobaTestCharacter>(GetOwner());
-	AStrategyChar * holop = Cast<AStrategyChar>(GetOwner());
 	if (character)
 		Level = character->GetLevel();
 	return  Level == 1 ? BaseHealth : BaseHealth + (BaseHealth * HealthLevelBonus * Level);
@@ -141,7 +140,6 @@ float UMobaCombatCharacterComponent::GetModifiedHealthRegen()
 {
 	int Level = 1;
 	const AMobaTestCharacter * character = Cast<AMobaTestCharacter>(GetOwner());
-	AStrategyChar * holop = Cast<AStrategyChar>(GetOwner());
 	if (character)
 		Level = character->GetLevel();
 	return  Level == 1 ? BaseHealthRegen : BaseHealthRegen + (BaseHealthRegen * HealthRegenLevelBonus * Level);

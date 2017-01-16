@@ -5,7 +5,7 @@
 #include "StrategyTypes.h"
 #include "StrategyGameState.generated.h"
 
-class AStrategyChar;
+class AMobaAICharacter;
 /*class AStrategyMiniMapCapture;*/
 
 UCLASS(config=Game)

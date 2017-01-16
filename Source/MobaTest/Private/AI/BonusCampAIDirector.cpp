@@ -63,12 +63,19 @@ void UBonusCampAIDirector::Spawn()
 		// and spawn our minion
 		FActorSpawnParameters SpawnInfo;
 		SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		SpawnInfo.Owner = GetOwner();
 
 		AMobaAICharacter* const Char = GetWorld()->SpawnActor<AMobaAICharacter>(Owner->MonsterCharClass, Loc, Owner->GetActorRotation(), SpawnInfo);
 		// don't continue if he died right away on spawn
 		if (Char != nullptr)
 		{
 			Char->SpawnDefaultController();
+			AMobaAIController * ctrl = Cast<AMobaAIController>(Char->Controller);
+			if (ctrl)
+			{
+				ctrl->SetAgressive(false);
+				MonsterAIController = ctrl;
+			}
 		}
 		else
 		{

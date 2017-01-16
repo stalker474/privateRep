@@ -26,16 +26,10 @@ void AFakeProjectile::Tick( float DeltaTime )
 	Super::Tick( DeltaTime );
 	if (Target.IsValid())
 	{
-		AMobaTestCharacter * player = Cast<AMobaTestCharacter>(Target.Get());
-		AStrategyChar * holop = Cast<AStrategyChar>(Target.Get());
-		if(holop)
-			MovementComp->HomingTargetComponent = holop->GetMesh();
-		else if (player)
-			MovementComp->HomingTargetComponent = player->GetMesh();
-		//MovementComponent->HomingAccelerationMagnitude = 1.0f;
+		ACharacter * anyChar = Cast<ACharacter>(Target.Get());
+		if(anyChar)
+			MovementComp->HomingTargetComponent = anyChar->GetMesh();
 	}
-	
-
 }
 
 void AFakeProjectile::OnImpact(const FHitResult& HitResult)

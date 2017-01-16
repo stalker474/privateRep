@@ -2,7 +2,9 @@
 
 #include "MobaTest.h"
 #include "StrategyAIAction_AttackTarget.h"
-#include "StrategyAIController.h"
+#include "BaseAIController.h"
+#include "StrategyChar.h"
+#include "MobaAICharacter.h"
 #include "VisualLogger/VisualLogger.h"
 
 UStrategyAIAction_AttackTarget::UStrategyAIAction_AttackTarget(const FObjectInitializer& ObjectInitializer)
@@ -10,6 +12,7 @@ UStrategyAIAction_AttackTarget::UStrategyAIAction_AttackTarget(const FObjectInit
 , MeleeAttackAnimationEndTime(0)
 , bIsPlayingAnimation(false)
 , bMovingToTarget(false)
+, bCanAttack(false)
 {
 	// Non-property initialization
 }
@@ -32,13 +35,13 @@ bool UStrategyAIAction_AttackTarget::Tick(float DeltaTime)
 
 		// try move closer if needed again
 		MoveCloser();
-
-		if (!bMovingToTarget)
+		
+		if (!bMovingToTarget && bCanAttack)
 		{
-			AStrategyChar* const MyChar = Cast<AStrategyChar>(MyAIController->GetPawn());
-			if (MyChar != NULL)
+			AMobaAICharacter * const MyMobaAIChar = Cast<AMobaAICharacter>(MyAIController->GetPawn());
+			if (MyMobaAIChar != NULL)
 			{
-				MeleeAttackAnimationEndTime = MyAIController->GetWorld()->GetTimeSeconds() + MyChar->PlayMeleeAnim();
+				MeleeAttackAnimationEndTime = MyAIController->GetWorld()->GetTimeSeconds() + MyMobaAIChar->PlayMeleeAnim();
 				bIsPlayingAnimation = true;
 			}
 		}
@@ -78,16 +81,16 @@ void UStrategyAIAction_AttackTarget::MoveCloser()
 	}
 		
 	TargetDestination = TargetActor->GetActorLocation();
-	AStrategyChar* const MyChar = Cast<AStrategyChar>(MyAIController->GetPawn());
-	if( MyChar == nullptr )
+	AMobaAICharacter * const MyMobaAIChar = Cast<AMobaAICharacter>(MyAIController->GetPawn());
+	if( MyMobaAIChar == nullptr)
 	{
 		UE_LOG(LogMobaAI, Warning, TEXT("Invalid Char/Pawn in Move Closer")); 
 		return;
 	}
-	
-	check(MyChar->GetPawnData());
+	float AttackDistance;
 
-	const float AttackDistance = MyChar->GetPawnData()->AttackDistance;
+	AttackDistance = MyMobaAIChar->GetPawnData()->AttackDistance;
+
 	const float Dist = (TargetDestination - MyAIController->GetAdjustLocation()).Size2D();
 
 	if (Dist > AttackDistance)
@@ -96,6 +99,8 @@ void UStrategyAIAction_AttackTarget::MoveCloser()
 		bMovingToTarget = true;
 		MyAIController->MoveToActor(TargetActor.Get(), 0.9 * AttackDistance);
 	}
+	else
+		bCanAttack = Dist <= AttackDistance;
 }
 
 void UStrategyAIAction_AttackTarget::OnMoveCompleted()
@@ -105,6 +110,14 @@ void UStrategyAIAction_AttackTarget::OnMoveCompleted()
 	{
 		MyAIController->GetPathFollowingComponent()->AbortMove(*MyAIController->GetOwner(), FPathFollowingResultFlags::AlreadyAtGoal);
 	}
+	float AttackDistance;
+	AMobaAICharacter * const MyMobaAIChar = Cast<AMobaAICharacter>(MyAIController->GetPawn());
+
+	AttackDistance = MyMobaAIChar->GetPawnData()->AttackDistance;
+
+	const float Dist = (TargetDestination - MyAIController->GetAdjustLocation()).Size2D();
+
+	bCanAttack = Dist <= AttackDistance;
 }
 
 void UStrategyAIAction_AttackTarget::NotifyBump(FHitResult const& Hit)
@@ -112,7 +125,7 @@ void UStrategyAIAction_AttackTarget::NotifyBump(FHitResult const& Hit)
 	check(MyAIController.IsValid());
 
 	// if we hit our target, just stop movement
-	AStrategyChar* const HitChar = Cast<AStrategyChar>(Hit.Actor.Get());
+	AMobaAICharacter* const HitChar = Cast<AMobaAICharacter>(Hit.Actor.Get());
 	if (HitChar != NULL && AStrategyGameMode::OnEnemyTeam(HitChar, MyAIController->GetPawn()) && bMovingToTarget)
 	{
 		bMovingToTarget = false;

@@ -9,7 +9,7 @@ UStrategyAISensingComponent::UStrategyAISensingComponent(const FObjectInitialize
 	: Super(ObjectInitializer)
 {
 	SensingInterval = 0.2f;
-	SightRadius = 2200.0f;
+	SightRadius = 1000.0f;
 	SetPeripheralVisionAngle(180.0f);
 	bOnlySensePlayers = false;
 	bHearNoises = false;
@@ -25,13 +25,18 @@ void UStrategyAISensingComponent::InitializeComponent()
 
 bool UStrategyAISensingComponent::ShouldCheckVisibilityOf(APawn *Pawn) const
 {
-	AStrategyChar* const testChar = Cast<AStrategyChar>(Pawn);
+	AMobaAICharacter* const testChar = Cast<AMobaAICharacter>(Pawn);
 	AMobaTower* const mobaTower = Cast<AMobaTower>(Pawn);
+	AMobaTestCharacter * const player = Cast<AMobaTestCharacter>(Pawn);
 	if (testChar)
 		return !testChar->bHidden && testChar->CombatComponent->Health > 0 && AStrategyGameMode::OnEnemyTeam(Pawn, GetOwner());
 	else if (mobaTower)
 	{
 		return !mobaTower->bHidden && mobaTower->IsActive() && mobaTower->CombatComponent->Health > 0 && AStrategyGameMode::OnEnemyTeam(Pawn, GetOwner());
+	}
+	else if (player)
+	{
+		return !player->bHidden && player->CombatCharacterComponent->Health > 0 && AStrategyGameMode::OnEnemyTeam(player, GetOwner());
 	}
 	else
 		return false;
@@ -53,9 +58,9 @@ void UStrategyAISensingComponent::UpdateAISensing()
 
 	for (FConstPawnIterator Iterator = Owner->GetWorld()->GetPawnIterator(); Iterator; ++Iterator)
 	{
-		AMobaTestCharacter * const player = Cast<AMobaTestCharacter>(*Iterator);
 		AStrategyChar* const charHolop = Cast<AStrategyChar>(*Iterator);
 		AMobaTower* const mobaTower = Cast<AMobaTower>(*Iterator);
+		AMobaTestCharacter * const player = Cast<AMobaTestCharacter>(*Iterator);
 		if (player) //its a player
 		{
 			if (AStrategyGameMode::OnEnemyTeam(player, GetOwner()))

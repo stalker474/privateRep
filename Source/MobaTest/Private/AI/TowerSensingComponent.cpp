@@ -24,7 +24,7 @@ void UTowerSensingComponent::InitializeComponent()
 
 bool UTowerSensingComponent::ShouldCheckVisibilityOf(APawn *Pawn) const
 {
-	AStrategyChar* const TestChar = Cast<AStrategyChar>(Pawn);
+	AMobaAICharacter* const TestChar = Cast<AMobaAICharacter>(Pawn);
 	return TestChar != nullptr && !TestChar->bHidden && TestChar->CombatComponent->Health > 0 && AStrategyGameMode::OnEnemyTeam(Pawn, GetOwner());
 }
 
@@ -59,7 +59,7 @@ void UTowerSensingComponent::UpdateAISensing()
 		}
 		else
 		{
-			AStrategyChar* const TestChar = Cast<AStrategyChar>(*Iterator);
+			AMobaAICharacter* const TestChar = Cast<AMobaAICharacter>(*Iterator);
 			if (TestChar)
 			{
 				if (!IsSensorActor(TestChar) && ShouldCheckVisibilityOf(TestChar))
@@ -78,7 +78,7 @@ void UTowerSensingComponent::UpdateAISensing()
 
 	for (int32 i = KnownTargets.Num() - 1; i >= 0; i--)
 	{
-		const AStrategyChar* TestChar = Cast<AStrategyChar>(KnownTargets[i].Get());
+		const AMobaAICharacter* TestChar = Cast<AMobaAICharacter>(KnownTargets[i].Get());
 		const AMobaTestCharacter* TestPlayer = Cast<AMobaTestCharacter>(KnownTargets[i].Get());
 		if (TestChar == NULL && TestPlayer == NULL)
 		{

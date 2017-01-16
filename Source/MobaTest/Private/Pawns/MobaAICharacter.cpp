@@ -2,6 +2,8 @@
 
 #include "MobaTest.h"
 #include "MobaAICharacter.h"
+#include "MobaPlayerController.h"
+#include "BaseAIController.h"
 
 DEFINE_LOG_CATEGORY(LogMobaAIChar);
 
@@ -21,7 +23,7 @@ AMobaAICharacter::AMobaAICharacter(const FObjectInitializer& ObjectInitializer)
 		GetCharacterMovement()->bAlwaysCheckFloor = false;
 	}
 
-	AIControllerClass = AStrategyAIController::StaticClass();
+	AIControllerClass = AMobaAIController::StaticClass();
 
 	CombatComponent = CreateDefaultSubobject<UMobaCombatCharacterComponent>(TEXT("Combat component"));
 }
@@ -37,7 +39,10 @@ void AMobaAICharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & 
 void AMobaAICharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	if (this->Role == ROLE_Authority)
+	{
+		GetCharacterMovement()->MaxWalkSpeed = GetPawnData()->Speed;
+	}
 }
 
 // Called every frame
@@ -61,7 +66,7 @@ void AMobaAICharacter::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPr
 	if (bSelfMoved)
 	{
 		// if we controlled by an AI, let it know we ran into something
-		AStrategyAIController* const AI = Cast<AStrategyAIController>(Controller);
+		ABaseAIController* const AI = Cast<ABaseAIController>(Controller);
 		if (AI)
 		{
 			AI->NotifyBump(Hit);
@@ -127,11 +132,14 @@ float AMobaAICharacter::TakeDamage(float Damage, struct FDamageEvent const& Dama
 		// no further damage if already dead
 		return 0.f;
 	}
+	AMobaPlayerController * ctrl = Cast<AMobaPlayerController>(EventInstigator);
+	if (ctrl)
+	{
+		ABaseAIController * aiCtrl = Cast<ABaseAIController>(Controller);
+		aiCtrl->ClaimAsTarget(ctrl);
+	}
+		
 	CombatComponent->ApplyDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
-
-	// Modify based on game rules.
-	AStrategyGameMode* const Game = GetWorld()->GetAuthGameMode<AStrategyGameMode>();
-	Damage = Game ? Game->ModifyDamage(Damage, this, DamageEvent, EventInstigator, DamageCauser) : 0.f;
 	return Damage;
 }
 
@@ -158,7 +166,7 @@ void AMobaAICharacter::Die(float KillingDamage, FDamageEvent const& DamageEvent,
 	GetWorldTimerManager().ClearAllTimersForObject(this);
 
 	// disable any AI
-	AStrategyAIController* const AIController = Cast<AStrategyAIController>(Controller);
+	ABaseAIController* const AIController = Cast<ABaseAIController>(Controller);
 	if (AIController)
 	{
 		AIController->EnableLogic(false);
@@ -214,4 +222,9 @@ void AMobaAICharacter::OnDieAnimationEnd()
 	this->SetActorHiddenInGame(true);
 	// delete the pawn asap
 	SetLifeSpan(0.01f);
+}
+
+const struct FPawnData* AMobaAICharacter::GetPawnData() const
+{
+	return &PawnData;
 }

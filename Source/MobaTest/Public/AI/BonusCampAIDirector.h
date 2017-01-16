@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "MobaAIController.h"
 #include "Components/ActorComponent.h"
 #include "BonusCampAIDirector.generated.h"
 
@@ -22,12 +23,17 @@ public:
 	/** notify about new game state */
 	void OnGameplayStateChange(EGameplayState::Type NewState);
 
+	UPROPERTY(EditAnywhere)
+	TWeakObjectPtr<AMobaAIController> MonsterAIController;
+
 protected:
 	/** check conditions and spawn if possible */
 	void Spawn();
 
 	/** next time to spawn */
+	UPROPERTY()
 	float NextSpawnTime;
-
+	
+	UPROPERTY()
 	bool MonstersAlive;
 };

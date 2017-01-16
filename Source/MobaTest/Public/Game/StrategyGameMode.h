@@ -22,19 +22,6 @@ class AStrategyGameMode : public AGameMode
 	/** Initialize the GameState actor. */
 	virtual void InitGameState() override;
 	
-	/** 
-	 * Modify the damage we want to apply to an actor.
-	 * 
-	  * @param Damage			The damage
-	  * @param DamagedActor		The actor we wish to damage
-	  * @param DamageEvent		The event that caused the damage
-	  * @param EventInstigator	
-	  * @param DamageCauser
-	  *
-	  * @returns The adjusted damage amount
-	  */
-	virtual float ModifyDamage(float Damage, AActor* DamagedActor, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) const;
-
 	UFUNCTION()
 	void Ready(AController* Player);
 

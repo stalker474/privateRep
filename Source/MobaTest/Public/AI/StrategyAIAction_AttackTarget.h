@@ -55,8 +55,11 @@ protected:
 	float MeleeAttackAnimationEndTime;
 
 	/** if pawn is playing attack animation */
-	uint32 bIsPlayingAnimation : 1;
+	bool bIsPlayingAnimation;
 
 	/** set to true when we are moving to our target */
-	uint32 bMovingToTarget : 1;
+	bool bMovingToTarget;
+
+	/** set to true when we are close enough to attack */
+	bool bCanAttack;
 };

@@ -81,40 +81,6 @@ UClass* AStrategyGameMode::GetDefaultPawnClassForController_Implementation(ACont
 	
 }
 
-float AStrategyGameMode::ModifyDamage(float Damage, AActor* DamagedActor, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) const
-{
-	// no health changes after game is finished
-	if (GetGameplayState() == EGameplayState::Finished)
-	{
-		return 0.0f;
-	}
-	
-	if (Damage > 0.f)
-	{
-		const IStrategyTeamInterface* VictimTeam = Cast<IStrategyTeamInterface>(DamagedActor);
-		IStrategyTeamInterface* InstigatorTeam = Cast<IStrategyTeamInterface>(EventInstigator);
-		if (InstigatorTeam == nullptr)
-		{
-			InstigatorTeam = Cast<IStrategyTeamInterface>(DamageCauser);
-		}
-
-		// skip friendly fire
-		if (InstigatorTeam && VictimTeam && InstigatorTeam->GetTeamNum() == VictimTeam->GetTeamNum())
-		{
-			return 0.0f;
-		}
-
-		// pawn's damage reduction
-		const AStrategyChar* DamagedChar = Cast<AStrategyChar>(DamagedActor);
-		if (DamagedChar)
-		{
-			Damage -= DamagedChar->GetPawnData()->DamageReduction;
-		}
-	}
-
-	return Damage;
-}
-
 void AStrategyGameMode::Ready(AController* Player)
 {
 	AMobaPlayerState * ps = Cast<AMobaPlayerState>(Player->PlayerState);
@@ -239,6 +205,9 @@ bool AStrategyGameMode::OnEnemyTeam(const AActor* ActorA, const AActor* ActorB)
 {
 	const IStrategyTeamInterface* TeamA = Cast<const IStrategyTeamInterface>(ActorA);
 	const IStrategyTeamInterface* TeamB = Cast<const IStrategyTeamInterface>(ActorB);
+
+	if (TeamA == nullptr || TeamB == nullptr) //if one has no team, enemies
+		return true;
 
 	if( (TeamA != nullptr && TeamA->GetTeamNum() == EStrategyTeam::Spectator) || (TeamB != nullptr && TeamB->GetTeamNum() == EStrategyTeam::Spectator))
 		return false;

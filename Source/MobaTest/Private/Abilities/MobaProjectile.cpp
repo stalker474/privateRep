@@ -71,12 +71,8 @@ void AMobaProjectile::OnImpact(const FHitResult& HitResult)
 		//Explode(HitResult);
 		FDamageEvent customEvent;
 		customEvent.DamageTypeClass = WeaponConfig.DamageType;
-		IStrategyTeamInterface * teamActor = Cast<IStrategyTeamInterface>(HitResult.Actor.Get());
-		IStrategyTeamInterface * myTeam = Cast<IStrategyTeamInterface>(GetOwner());
-		auto p = GetOwner();
-		if (teamActor == nullptr)
-			UE_LOG(ProjectileLog, Warning, TEXT("Projectile collision handling a bad actor!"));
-		if (teamActor && (teamActor->GetTeamNum() != myTeam->GetTeamNum()))
+
+		if (!AStrategyGameMode::OnFriendlyTeam(GetOwner(), HitResult.Actor.Get()))
 			HitResult.Actor.Get()->TakeDamage(WeaponConfig.ExplosionDamage, customEvent, nullptr, this);
 		DisableAndDestroy();
 	}

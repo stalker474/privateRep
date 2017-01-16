@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "MobaCombatCharacterComponent.h"
 #include "GameFramework/Character.h"
 #include "MobaAICharacter.generated.h"
 
@@ -20,6 +21,7 @@ class MOBATEST_API AMobaAICharacter : public ACharacter
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = CombatComponent)
 	UMobaCombatCharacterComponent * CombatComponent;
+
 public:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -53,14 +55,16 @@ public:
 	*/
 	float PlayMeleeAnim();
 
-	UFUNCTION(NetMulticast, Reliable, WithValidation)
-		void MULTICAST_PlayMeleeAnim();
-
-	UFUNCTION(NetMulticast, Reliable, WithValidation)
-		void MULTICAST_PlayDeathAnim();
-
 	/** Notification triggered from the melee animation to signal impact. */
 	void OnMeleeImpactNotify();
+
+	UFUNCTION(NetMulticast, Reliable, WithValidation)
+	void MULTICAST_PlayMeleeAnim();
+
+	UFUNCTION(NetMulticast, Reliable, WithValidation)
+	void MULTICAST_PlayDeathAnim();
+
+	const struct FPawnData* GetPawnData() const;
 
 protected:
 	/** melee anim */

@@ -129,7 +129,7 @@ void ATowerAIController::SelectTarget()
 		}
 
 		float TargetScore = (PawnLocation - TestTarget->GetActorLocation()).SizeSquared();
-		if (CurrentTarget == TestTarget && TestTarget->IsA(AStrategyChar::StaticClass()))
+		if (CurrentTarget == TestTarget && TestTarget->IsA(AMobaAICharacter::StaticClass()))
 		{
 			TargetScore -= FMath::Square(300.0f);
 		}
