@@ -11,6 +11,7 @@ UBonusCampAIDirector::UBonusCampAIDirector(const FObjectInitializer& ObjectIniti
 	: Super(ObjectInitializer)
 	, NextSpawnTime(0.1f)
 	,MonstersAlive(false)
+	,IsMonsterAgressive(false)
 {
 	PrimaryComponentTick.bCanEverTick = true;
 	PrimaryComponentTick.bStartWithTickEnabled = false;
@@ -62,7 +63,7 @@ void UBonusCampAIDirector::Spawn()
 
 		// and spawn our minion
 		FActorSpawnParameters SpawnInfo;
-		SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 		SpawnInfo.Owner = GetOwner();
 
 		AMobaAICharacter* const Char = GetWorld()->SpawnActor<AMobaAICharacter>(Owner->MonsterCharClass, Loc, Owner->GetActorRotation(), SpawnInfo);
@@ -73,7 +74,8 @@ void UBonusCampAIDirector::Spawn()
 			AMobaAIController * ctrl = Cast<AMobaAIController>(Char->Controller);
 			if (ctrl)
 			{
-				ctrl->SetAgressive(false);
+				ctrl->SetAgressive(IsMonsterAgressive);
+				ctrl->SetAuthorizedTargetsOnly(true);
 				MonsterAIController = ctrl;
 			}
 		}

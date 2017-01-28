@@ -11,6 +11,7 @@ ABonusCamp::ABonusCamp(const FObjectInitializer& ObjectInitializer)
 
 	AIDirector = CreateDefaultSubobject<UBonusCampAIDirector>(TEXT("AIDirectorComp"));
 	AIDirector->SetIsReplicated(false);
+	AIDirector->IsMonsterAgressive = false;
 	CapsuleTriggerBox = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CapsuleTrigger"));
 	CapsuleTriggerBox->bAutoActivate = true;
 	CapsuleTriggerBox->SetIsReplicated(false);

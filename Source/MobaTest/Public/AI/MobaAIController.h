@@ -19,6 +19,8 @@ public:
 
 	void SetAgressive(bool IsAgressive);
 
+	void SetAuthorizedTargetsOnly(bool IsAuthorizedTargetsOnly);
+
 	void AddAuthorizedTarget(APawn * Target);
 
 	void RemoveAuthorizedTarget(APawn * Target);
@@ -27,6 +29,8 @@ protected:
 	virtual float ComputeScore(const APawn* TestPawn) override;
 
 	bool IsAgressive;
+
+	bool IsAuthorizedTargetsOnly;
 
 	TArray<APawn*> AuthorizedTargetsAsNonAgressive;
 };

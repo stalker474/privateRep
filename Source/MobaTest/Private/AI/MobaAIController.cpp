@@ -26,7 +26,7 @@ bool AMobaAIController::IsTargetValid(AActor* InActor) const
 	APawn * pawn = Cast<APawn>(InActor);
 	if (character && !IsAgressive && !IsClaimedBy(character->GetController()))
 		return false;
-	if (pawn && !IsAgressive && !AuthorizedTargetsAsNonAgressive.Contains<APawn*>(pawn))
+	if (pawn && IsAuthorizedTargetsOnly && !AuthorizedTargetsAsNonAgressive.Contains<APawn*>(pawn))
 		return false;
 	// try to find a character
 	const AMobaTestCharacter* testPlayer = Cast<AMobaTestCharacter>(InActor);
@@ -38,6 +38,11 @@ bool AMobaAIController::IsTargetValid(AActor* InActor) const
 void AMobaAIController::SetAgressive(bool _IsAgressive)
 {
 	IsAgressive = _IsAgressive;
+}
+
+void AMobaAIController::SetAuthorizedTargetsOnly(bool _IsAuthorizedTargetsOnly)
+{
+	IsAuthorizedTargetsOnly = _IsAuthorizedTargetsOnly;
 }
 
 void AMobaAIController::AddAuthorizedTarget(APawn * Target)

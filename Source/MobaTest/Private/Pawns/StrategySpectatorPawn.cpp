@@ -15,6 +15,12 @@ AStrategySpectatorPawn::AStrategySpectatorPawn(const FObjectInitializer& ObjectI
 	StrategyCameraComponent->FieldOfView = 90.0f;
 }
 
+void AStrategySpectatorPawn::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(AStrategySpectatorPawn, TeamNum);
+}
+
 void AStrategySpectatorPawn::OnMouseScrollUp()
 {
 	StrategyCameraComponent->OnZoomIn();
@@ -54,5 +60,10 @@ UStrategyCameraComponent* AStrategySpectatorPawn::GetStrategyCameraComponent()
 {
 	check( StrategyCameraComponent != NULL );
 	return StrategyCameraComponent;
+}
+
+uint8 AStrategySpectatorPawn::GetTeamNum() const
+{
+	return TeamNum;
 }
 

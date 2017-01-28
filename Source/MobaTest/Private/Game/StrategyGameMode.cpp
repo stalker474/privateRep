@@ -21,7 +21,7 @@ AStrategyGameMode::AStrategyGameMode(const FObjectInitializer& ObjectInitializer
 	DefaultCharacterClass = nullptr;
 	InGameHUDClass = nullptr;
 
-	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/Characters/ThirdPersonCPP/Blueprints/ThirdPersonCharacter"));
+	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/Blueprints/Characters/ThirdPersonCharacter"));
 	if (PlayerPawnBPClass.Class != NULL)
 	{
 		DefaultCharacterClass = PlayerPawnBPClass.Class;

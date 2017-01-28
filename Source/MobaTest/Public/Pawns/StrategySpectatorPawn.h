@@ -7,7 +7,7 @@
 
 //@TODO: Write a comment here
 UCLASS(Blueprintable, BlueprintType)
-class AStrategySpectatorPawn : public ASpectatorPawn
+class AStrategySpectatorPawn : public ASpectatorPawn, public IStrategyTeamInterface
 {
 	GENERATED_UCLASS_BODY()
 
@@ -38,6 +38,14 @@ public:
 	
 	/* Returns a pointer to the strategy camera component the pawn has. */
 	UStrategyCameraComponent* GetStrategyCameraComponent();
+
+	// Begin StrategyTeamInterface Interface
+	UFUNCTION(BlueprintCallable, Category = "Team")
+	virtual uint8 GetTeamNum() const override;
+	// End StrategyTeamInterface Interface
+
+	UPROPERTY(Replicated, EditInstanceOnly, Category = Building)
+	TEnumAsByte<EStrategyTeam::Type> TeamNum;
 };
 
 

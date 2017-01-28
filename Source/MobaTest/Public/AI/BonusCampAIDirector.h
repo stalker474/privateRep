@@ -26,9 +26,12 @@ public:
 	UPROPERTY(EditAnywhere)
 	TWeakObjectPtr<AMobaAIController> MonsterAIController;
 
+	UPROPERTY()
+	bool IsMonsterAgressive;
+
 protected:
 	/** check conditions and spawn if possible */
-	void Spawn();
+	virtual void Spawn();
 
 	/** next time to spawn */
 	UPROPERTY()

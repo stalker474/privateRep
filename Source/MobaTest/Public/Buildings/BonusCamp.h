@@ -11,7 +11,8 @@ UCLASS()
 class MOBATEST_API ABonusCamp : public APawn
 {
 	GENERATED_UCLASS_BODY()
-private:
+
+public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = BonusCamp, meta = (AllowPrivateAccess = "true"))
 	UBonusCampAIDirector* AIDirector;
 
