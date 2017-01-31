@@ -12,6 +12,7 @@ AMobaPlayerState::AMobaPlayerState(const FObjectInitializer& ObjectInitializer)
 
 	SelectedChar = nullptr;
 	MyStart = nullptr;
+	IsCharacter = false;
 
 	Level = 1;
 	Experience = 0;
@@ -54,6 +55,7 @@ void AMobaPlayerState::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & 
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(AMobaPlayerState, SelectedCharClass);
 	DOREPLIFETIME(AMobaPlayerState, State);
+	DOREPLIFETIME(AMobaPlayerState, IsCharacter);
 	DOREPLIFETIME(AMobaPlayerState, Level);
 	DOREPLIFETIME(AMobaPlayerState, Experience);
 	DOREPLIFETIME(AMobaPlayerState, Money);
@@ -81,6 +83,7 @@ void AMobaPlayerState::CopyProperties(class APlayerState* PlayerState)
 		MyPlayerState->SelectedCharClass = SelectedCharClass;
 		MyPlayerState->MyTeamNum = MyTeamNum;
 		MyPlayerState->State = State;
+		MyPlayerState->IsCharacter = IsCharacter;
 	}
 
 }
@@ -120,6 +123,7 @@ void AMobaPlayerState::ChoseCharacter_Implementation(TSubclassOf<class AMobaTest
 
 			SelectedChar = world->SpawnActor<AMobaTestCharacter>(CharacterClass, Start->GetActorLocation(), Start->GetActorRotation());
 			SelectedCharClass = CharacterClass;
+			IsCharacter = true;
 
 		}
 	}

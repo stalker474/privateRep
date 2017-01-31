@@ -188,19 +188,6 @@ void UStrategyAIDirector::SpawnMinions()
 				MinionChar->GetMesh()->GlobalAnimRateScale = AnimationRate;
 
 				AStrategyGameState* const GameState = GetWorld()->GetGameState<AStrategyGameState>();
-				if (GameState != nullptr)
-				{
-
-				}
-
-				if (DefaultWeapon != nullptr)
-				{
-					UStrategyGameBlueprintLibrary::GiveWeaponFromClass(MinionChar, DefaultWeapon);
-				}
-				if (DefaultArmor != nullptr)
-				{
-					UStrategyGameBlueprintLibrary::GiveArmorFromClass(MinionChar, DefaultArmor);
-				}
 
 				LeftToSpawn -= 1;
 				LeftToSpawn = FMath::Max(LeftToSpawn, 0);

@@ -6,6 +6,7 @@
 #include "StrategyTeamInterface.h"
 #include "MobaTestCharacter.h"
 #include "StrategySpawnPoint.h"
+#include "SpectatorStrategySpawnPoint.h"
 #include "MobaPlayerState.h"
 #include "StrategyTeamInterface.h"
 #include "MobaPlayerController.h"
@@ -21,7 +22,7 @@ AStrategyGameMode::AStrategyGameMode(const FObjectInitializer& ObjectInitializer
 	DefaultCharacterClass = nullptr;
 	InGameHUDClass = nullptr;
 
-	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/Blueprints/Characters/ThirdPersonCharacter"));
+	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/Blueprints/Characters/MobaStratPlayer"));
 	if (PlayerPawnBPClass.Class != NULL)
 	{
 		DefaultCharacterClass = PlayerPawnBPClass.Class;
@@ -31,6 +32,12 @@ AStrategyGameMode::AStrategyGameMode(const FObjectInitializer& ObjectInitializer
 	if (PlayerHUDBPClass.Class != NULL)
 	{
 		InGameHUDClass = PlayerHUDBPClass.Class;
+	}
+
+	static ConstructorHelpers::FClassFinder<AHUD> PlayerHUDStrategicBPClass(TEXT("/Game/UI/HUD/MobaStrategyHUD"));
+	if (PlayerHUDStrategicBPClass.Class != NULL)
+	{
+		InGameHUDStrategicClass = PlayerHUDStrategicBPClass.Class;
 	}
 
 	PlayerStateClass = AMobaPlayerState::StaticClass();
@@ -69,14 +76,30 @@ UClass* AStrategyGameMode::GetDefaultPawnClassForController_Implementation(ACont
 		return DefaultPawnClass;
 	else
 	{
-		APlayerController * pc = Cast<APlayerController>(InController);
-		pc->ClientSetHUD(InGameHUDClass);
+		AMobaPlayerController * pc = Cast<AMobaPlayerController>(InController);
 	
 		if (ps->SelectedCharClass)
+		{
+			pc->ClientSetHUD(InGameHUDClass);
 			return ps->SelectedCharClass;
+		}
+			
 		if (DefaultCharacterClass)
+		{
+			pc->ClientSetHUD(InGameHUDStrategicClass);
+			pc->SetStrategistMode();
 			return DefaultCharacterClass;
-		else return DefaultPawnClass;
+		}
+		else if(!ps->IsCharacter)
+		{
+			pc->ClientSetHUD(InGameHUDStrategicClass);
+			pc->SetStrategistMode();
+			return DefaultPawnClass;
+		}
+		else
+		{
+			return nullptr;
+		}
 	}
 	
 }
@@ -154,6 +177,14 @@ bool AStrategyGameMode::IsSpawnpointAllowed(APlayerStart* SpawnPoint, AControlle
 	if (spawnPoint)
 	{
 		AMobaPlayerState * ps = Cast<AMobaPlayerState>(Player->PlayerState);
+		if (!ps->IsCharacter)
+		{
+			ASpectatorStrategySpawnPoint* spectatorPoint = Cast<ASpectatorStrategySpawnPoint>(spawnPoint);
+			if (spectatorPoint)
+				return (gs == EGameplayState::Joining && (spectatorPoint->GetTeamNum() == ps->GetTeam()));
+			else
+				return false;
+		}
 		if (gs == EGameplayState::ChosingCharacter && (spawnPoint->GetTeamNum() == ps->GetTeam()) && !spawnPoint->IsSpawnable)
 			return true;
 		else if (gs == EGameplayState::Joining && (spawnPoint->GetTeamNum() == ps->GetTeam()) && spawnPoint->IsSpawnable)

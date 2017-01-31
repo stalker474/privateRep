@@ -32,6 +32,9 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	UFUNCTION()
+	void OnClicked(UPrimitiveComponent* Component, FKey Key);
+
 	/**
 	* Kills pawn.
 	* @param KillingDamage - Damage amount of the killing blow

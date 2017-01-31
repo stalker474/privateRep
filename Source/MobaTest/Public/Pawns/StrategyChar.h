@@ -22,34 +22,12 @@ public:
 	virtual uint8 GetTeamNum() const override;
 	// End StrategyTeamInterface interface
 
-	/** set attachment for weapon slot */
-	UFUNCTION(BlueprintCallable, Category=Attachment)
-	void SetWeaponAttachment(UStrategyAttachment* Weapon);
-
-	UFUNCTION(BlueprintCallable, Category=Attachment)
-	bool IsWeaponAttached();
-
-	/** set attachment for armor slot */
-	UFUNCTION(BlueprintCallable, Category=Attachment)
-	void SetArmorAttachment(UStrategyAttachment* Armor);
-
-	UFUNCTION(BlueprintCallable, Category=Attachment)
-	bool IsArmorAttached();
-
 	/** set team number */
 	void SetTeamNum(uint8 NewTeamNum); 
 
 	ELaneEnum LanePosition;
 
 protected:
-	
-	/** Armor attachment slot */
-	UPROPERTY()
-	UStrategyAttachment* ArmorSlot;
-
-	/** Weapon attachment slot */
-	UPROPERTY()
-	UStrategyAttachment* WeaponSlot;
 
 	/** team number */
 	UPROPERTY(Replicated)

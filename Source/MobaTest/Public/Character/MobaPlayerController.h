@@ -21,6 +21,9 @@ public:
 	UFUNCTION()
 	void Respawn();
 
+	UFUNCTION()
+	void SetStrategistMode();
+
 private:
 	FTimerHandle TimerHandle_Respawn;
 };

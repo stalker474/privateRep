@@ -17,53 +17,6 @@ void AStrategyChar::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & Out
 	DOREPLIFETIME(AStrategyChar, MyTeamNum);
 }
 
-void AStrategyChar::SetWeaponAttachment(UStrategyAttachment* Weapon)
-{
-	if (WeaponSlot != Weapon)
-	{
-		// detach any existing weapon attachment
-		if (WeaponSlot )
-		{
-			WeaponSlot->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
-		}
-
-		// attach this one
-		WeaponSlot = Weapon;
-		if (WeaponSlot )
-		{
-			WeaponSlot->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, WeaponSlot->AttachPoint);
-		}
-	}
-}
-
-void AStrategyChar::SetArmorAttachment(UStrategyAttachment* Armor)
-{
-	if (ArmorSlot != Armor)
-	{
-		// detach any existing armor attachment
-		if (ArmorSlot )
-		{
-			ArmorSlot->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
-		}
-		// attach this one
-		ArmorSlot = Armor;
-		if (ArmorSlot )
-		{
-			ArmorSlot->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, ArmorSlot->AttachPoint);
-		}
-	}
-}
-
-bool AStrategyChar::IsWeaponAttached()
-{
-	return WeaponSlot != nullptr;
-}
-
-bool AStrategyChar::IsArmorAttached()
-{
-	return ArmorSlot != nullptr;
-}
-
 uint8 AStrategyChar::GetTeamNum() const
 {
 	return MyTeamNum;

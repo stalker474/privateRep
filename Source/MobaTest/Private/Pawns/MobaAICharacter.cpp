@@ -22,7 +22,7 @@ AMobaAICharacter::AMobaAICharacter(const FObjectInitializer& ObjectInitializer)
 		GetCharacterMovement()->bUseControllerDesiredRotation = true;
 		GetCharacterMovement()->bAlwaysCheckFloor = false;
 	}
-
+	GetCapsuleComponent()->OnClicked.AddDynamic(this, &AMobaAICharacter::OnClicked);
 	AIControllerClass = AMobaAIController::StaticClass();
 
 	CombatComponent = CreateDefaultSubobject<UMobaCombatCharacterComponent>(TEXT("Combat component"));
@@ -57,6 +57,11 @@ void AMobaAICharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+}
+
+void AMobaAICharacter::OnClicked(UPrimitiveComponent* Component, FKey Key)
+{
+	Destroy();
 }
 
 void AMobaAICharacter::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalForce, const FHitResult& Hit)

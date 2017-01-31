@@ -99,6 +99,9 @@ public:
 
 	UPROPERTY(Replicated, BlueprintReadOnly, Category="Selected character")
 	TSubclassOf<AMobaTestCharacter> SelectedCharClass;
+
+	UPROPERTY(Replicated, BlueprintReadOnly, Category = "Character type")
+	bool IsCharacter;
 protected:
 
 	UMobaItem** GetNextEmptySlot();

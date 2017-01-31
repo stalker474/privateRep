@@ -22,3 +22,10 @@ void AMobaPlayerController::Respawn()
 		Possess(newPawn);
 	}
 }
+
+void AMobaPlayerController::SetStrategistMode()
+{
+	bShowMouseCursor = true;
+	bEnableClickEvents = true;
+	bEnableMouseOverEvents = true;
+}

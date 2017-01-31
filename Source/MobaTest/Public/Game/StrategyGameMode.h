@@ -79,6 +79,7 @@ protected:
 
 	UClass * DefaultCharacterClass;
 	UClass * InGameHUDClass;
+	UClass * InGameHUDStrategicClass;
 
 	/* Helper to return the current gameplay state. */
 	EGameplayState::Type GetGameplayState() const;
